@@ -1,0 +1,884 @@
+---
+- name: "1.1.1.1 | Ensure mounting of cramfs filesystems is disabled (Scored)"
+  lineinfile:
+    dest: /etc/modprobe.d/CIS.conf
+    regexp: "^(#)?install cramfs(\\s|$)"
+    line: "install cramfs /bin/true"
+    create: yes
+  when:
+    - rule_1_1_1_1|bool
+  tags:
+    - section_1
+    - scored
+    - cramfs
+
+- name: "1.1.1.1 | Remove cramfs module"
+  modprobe:
+    name: cramfs
+    state: absent
+  when:
+    - rule_1_1_1_1|bool
+    - ansible_connection != 'docker'
+  tags:
+    - section_1
+    - scored
+    - cramfs
+
+- name: "1.1.1.2 | Ensure mounting of vFAT filesystems is limited (Not Scored)"
+  lineinfile:
+    dest: /etc/modprobe.d/CIS.conf
+    regexp: "^(#)?install vfat(\\s|$)"
+    line: "install vfat /bin/true"
+    create: yes
+  when:
+    - rule_1_1_1_2|bool
+  tags:
+    - section_1
+    - not_scored
+    - vfat
+
+- name: "1.1.1.2 | Remove FAT module"
+  modprobe:
+    name: vfat
+    state: absent
+  when:
+    - rule_1_1_1_2|bool
+    - ansible_connection != 'docker'
+  tags:
+    - section_1
+    - not_scored
+    - vfat
+
+- name: "1.1.1.3 | Ensure mounting of squashfs filesystems is disabled (Scored)"
+  lineinfile:
+    dest: /etc/modprobe.d/CIS.conf
+    regexp: "^(#)?install squashfs(\\s|$)"
+    line: "install squashfs /bin/true"
+    create: yes
+  when:
+    - rule_1_1_1_3|bool
+  tags:
+    - section_1
+    - scored
+    - squashfs
+
+- name: "1.1.1.3 | Remove squashfs module"
+  modprobe:
+    name: squashfs
+    state: absent
+  when:
+    - rule_1_1_1_3|bool
+    - ansible_connection != 'docker'
+  tags:
+    - section_1
+    - scored
+    - squashfs
+
+
+- name: "1.1.1.4 | Ensure mounting of udf filesystems is disabled (Scored)"
+  lineinfile:
+    dest: /etc/modprobe.d/CIS.conf
+    regexp: "^(#)?install udf(\\s|$)"
+    line: "install udf /bin/true"
+    create: yes
+  when:
+    - rule_1_1_1_4|bool
+  tags:
+    - section_1
+    - scored
+    - udf
+
+- name: "1.1.1.4 | Remove udf module"
+  modprobe:
+    name: udf
+    state: absent
+  when:
+    - rule_1_1_1_4|bool
+    - ansible_connection != 'docker'
+  tags:
+    - section_1
+    - scored
+    - udf
+
+
+- name: "1.1.2 | Ensure separate partition exists for /tmp | enable and start/restart tmp.mount"
+  systemd:
+    name: tmp.mount
+    daemon_reload: yes
+    enabled: yes
+    masked: no
+    state: started
+  when:
+    - rule_1_1_2|bool
+  tags:
+    - section_1
+    - scored
+    - rule_1.1.2
+
+- name: "1.1.3 | 1.1.4 | 1.1.5 | Ensure nodev,nosuid,noexec options set on /tmp partition"
+  template:
+    src: tmp.mount.j2
+    dest: /etc/systemd/system/tmp.mount
+    owner: root
+    group: root
+    mode: 0644
+  notify: systemd restart tmp.mount
+  when: rule_1_1_3|bool or 
+        rule_1_1_4|bool or 
+        rule_1_1_5|bool
+  tags:
+    - section_1
+    - scored
+    - rule_1.1.3
+    - rule_1.1.4
+    - rule_1.1.5
+
+- name: "1.1.6 | Ensure separate partition exists for /var (Scored)"
+  shell: mount | grep "on /var "
+  args:
+    warn: false
+  register: var_mounted
+  changed_when: no
+  failed_when: no
+  when:
+    - rule_1_1_6
+  tags:
+    - level2
+    - scored
+    - section_1
+    - rule_1.1.6
+    - skip_ansible_lint
+
+- name: "1.1.7 | Ensure separate partition exists for /var/tmp (Scored)"
+  shell: mount | grep "on /var/tmp "
+  args:
+    warn: false
+  register: var_tmp_mounted
+  changed_when: no
+  failed_when: no
+  when:
+    - rule_1_1_7
+  tags:
+    - level2
+    - scored
+    - section_1
+    - rule_1.1.7
+    - skip_ansible_lint
+
+- name: "1.1.8  | Ensure nodev option set on /var/tmp partition (Scored)\n
+         1.1.9  | Ensure nosuid option set on /var/tmp partition (Scored)\n
+         1.1.10 | Ensure noexec option set on /var/tmp partition (Scored)"
+  mount:
+    name: /var/tmp
+    src: "{{ vartmp['source'] }}"
+    state: present
+    fstype: "{{ vartmp['fstype'] }}"
+    opts: "{{ vartmp['opts'] }}"
+  when:
+    - rule_1_1_8|bool
+    - rule_1_1_9|bool
+    - rule_1_1_10|bool
+  tags:
+    - level1
+    - scored
+    - patch
+    - rule_1.1.8
+    - rule_1.1.9
+    - rule_1.1.10
+
+- name: "1.1.11 | Ensure separate partition exists for /var/log (Scored)"
+  shell: mount | grep "on /var/log "
+  args:
+    warn: false
+  register: var_log_mounted
+  changed_when: no
+  failed_when: no
+  when:
+    - rule_1_1_11
+  tags:
+    - level2
+    - scored
+    - section_1
+    - rule_1.1.11
+    - skip_ansible_lint
+
+- name: "1.1.12 | Ensure separate partition exists for /var/log/audit (Scored)"
+  shell: mount | grep "on /var/log/audit "
+  args:
+    warn: false
+  register: var_log_audit_mounted
+  changed_when: no
+  failed_when: no
+  when:
+    - rule_1_1_12
+  tags:
+    - level2
+    - scored
+    - section_1
+    - rule_1.1.12
+    - skip_ansible_lint
+
+- name: "1.1.13 | Ensure separate partition exists for /home (Scored)"
+  shell: mount | grep "on /home"
+  args:
+    warn: false
+  register: home_mounted
+  changed_when: no
+  failed_when: no
+  when:
+    - rule_1_1_13|bool
+  tags:
+    - level2
+    - scored
+    - patch
+    - rule_1.1.13
+    - skip_ansible_lint
+
+- name: "1.1.14 | Ensure nodev option set on /home partition (Scored)"
+  mount:
+    name: "/home"
+    src: "{{ item.device }}"
+    state: mounted
+    fstype: "{{ item.fstype }}"
+    opts: "nodev"
+  when:
+    - rule_1_1_14|bool
+    - item.mount == "/home"
+  with_items: "{{ ansible_mounts }}"
+  tags:
+    - level1
+    - level2
+    - patch
+    - rule_1.1.14
+
+- name: "1.1.15 | Ensure nodev option set on /dev/shm partition (Scored)\n
+         1.1.16 | Ensure nosuid option set on /dev/shm partition (Scored)\n
+         1.1.17 | Ensure noexec option set on /dev/shm partition (Scored)"
+  mount:
+    name: /dev/shm
+    src: tmpfs
+    state: mounted
+    fstype: tmpfs
+    opts: "defaults,nodev,nosuid,noexec"
+  when:
+    - rule_1_1_15
+    - rule_1_1_16
+    - rule_1_1_17
+  tags:
+    - level1
+    - scored
+    - section_1
+    - rule_1.1.15
+    - rule_1.1.16
+    - rule_1.1.17
+
+- name: "1.1.18 | Ensure nodev option set on removable media partitions (Not Scored)"
+  debug:
+    msg: "--> Not relevant"
+  changed_when: no
+  when:
+    - rule_1_1_18
+  tags:
+    - level1
+    - notscored
+    - section_1
+    - rule_1.1.18
+
+- name: "1.1.19 | Ensure nosuid option set on removable media partitions (Not Scored)"
+  debug:
+    msg: "--> Not relevant"
+  changed_when: no
+  when:
+    - rule_1_1_19
+  tags:
+    - level1
+    - notscored
+    - section_1
+    - rule_1.1.19
+
+- name: "1.1.20 | Ensure noexec option set on removable media partitions (Not Scored)"
+  debug:
+    msg: "--> Not relevant"
+  changed_when: no
+  when:
+    - rule_1_1_20
+  tags:
+    - level1
+    - notscored
+    - section_1
+    - rule_1.1.20
+
+- name: "1.1.21 | Ensure sticky bit is set on all world-writable directories (Scored)"
+  shell: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type d -perm -0002 2>/dev/null | xargs chmod a+t
+  changed_when: no
+  failed_when: no
+  #when: sticky_bit_on_worldwritable_dirs_audit.rc == '0'
+  when:
+    - rule_1_1_21
+  tags:
+    - level1
+    - level2
+    - section_1
+    - rule_1.1.21
+
+- name: "1.1.22 | Disable Automounting (Scored)"
+  service:
+    name: autofs
+    enabled: no
+  when:
+    - "'autofs.service' in ansible_facts.services"
+    - rule_1_1_22|bool
+  tags:
+    - level1
+    - patch
+    - rule_1.1.22
+
+- name: "1.1.23 | Disable USB Storage (Scored)"
+  command: rmmod usb-storage
+  ignore_errors: yes
+  when:
+    - rule_1_1_23|bool
+  tags:
+    - level1
+    - scored
+    - patch
+    - rule_1.1.23
+    - usb
+
+- name: "1.2.1 | Ensure Red Hat Subscription Manager connection is configured (Not Scored)"
+  command: subscription-manager identity
+  register: subscription_configured
+  changed_when: no
+  failed_when: no
+  when:
+    - ansible_distribution == "redhat"
+    - rule_1_2_1
+  tags:
+    - level1
+    - notscored
+    - section_1
+    - rule_1.2.1
+    - skip_ansible_lint
+
+- name: "1.2.2 | Disable the rhnsd Daemon (Not Scored)"
+  systemd:
+    name: rhnsd
+    state: stopped
+    enabled: no
+  when:
+    - ansible_distribution == "redhat"
+    - "'rhnsd' in ansible_facts.packages"
+    - rule_1_2_2
+  tags:
+    - level2
+    - notscored
+    - section_1
+    - rule_1.2.2
+
+- name: "1.2.3 | Ensure GPG keys are configured (Not Scored)"
+  command: gpg --quiet --with-fingerprint /etc/pki/rpm-gpg/rpm-gpg-key-{{ ansible_distribution|lower }}-release
+  when:
+    - rule_1_2_3
+    - ansible_distribution == "redhat"
+  tags:
+    - level1
+    - notscored
+    - section_1
+    - rule_1.2.3
+
+- name: "1.2.4 | Ensure gpgcheck is globally activated (Scored)"
+  block:
+    - name: "1.2.4 | Ensure gpgcheck is globally activated (Scored)"
+      replace:
+        name: /etc/yum.conf
+        regexp: "^gpgcheck=0"
+        replace: "gpgcheck=1"
+
+    - name: "1.2.4 | Ensure gpgcheck is globally activated (Scored)"
+      find:
+        paths: /etc/yum.repos.d
+        patterns: "/*.repo"
+      register: yum_repos
+      changed_when: no
+
+    - name: "1.2.4 | Ensure gpgcheck is globally activated (Scored)"
+      replace:
+        name: "{{ item.path }}"
+        regexp: "^gpgcheck=0"
+        replace: "gpgcheck=1"
+      with_items:
+        - "{{ yum_repos.files }}"
+  when:
+    - rule_1_2_4
+  tags:
+    - level1
+    - scored
+    - section_1
+    - rule_1.2.4
+
+- name: "1.3.1 | Ensure sudo is installed (Scored)"
+  dnf:
+    name: sudo
+    state: present
+  when:
+    - rule_1_3_1
+  tags:
+    - level1
+    - scored
+    - section_1
+    - aide
+    - rule_1.3.1
+
+- name: "1.3.2 | Ensure sudo commands use pty (Scored)"
+  lineinfile:
+    dest: /etc/sudoers
+    regexp: '^\s*Defaults\s+use_pty'
+    line: 'Defaults use_pty'
+    create: yes
+  when:
+    - rule_1_3_2
+  tags:
+    - level1
+    - scored
+    - section_1
+    - aide
+    - rule_1.3.2
+
+- name: "1.3.3 | Ensure sudo log file exists (Scored)"
+  lineinfile:
+    dest: /etc/sudoers
+    regexp: '^\s*Defaults\s+([^#]+,\s*)?logfile="\/var\/log\/sudo\.log"'
+    line: 'Defaults  logfile="/var/log/sudo.log"'
+    create: yes
+  when:
+    - rule_1_3_3
+  tags:
+    - level1
+    - scored
+    - section_1
+    - aide
+    - rule_1.3.3
+
+- name: "1.4.1 | Ensure AIDE is installed (Scored)"
+  package:
+    name: aide
+    state: present
+  when:
+    - rule_1_4_1|bool
+  tags:
+    - level1
+    - scored
+    - aide
+    - patch
+    - rule_1.4.1
+
+- name: "1.4.1 | Ensure AIDE is installed (Scored)"
+  command: /usr/sbin/aide --init -B 'database_out=file:/var/lib/aide/aide.db.gz'
+  args:
+      creates: /var/lib/aide/aide.db.gz
+  changed_when: no
+  failed_when: no
+  async: 45
+  poll: 0
+  when:
+    - config_aide|bool
+    - rule_1_4_1|bool
+  tags:
+    - level1
+    - scored
+    - aide
+    - patch
+    - rule_1.4.1
+
+- name: "1.4.2 | Ensure filesystem integrity is regularly checked (Scored)"
+  cron:
+    name: Run AIDE integrity check
+    cron_file: "{{ aide_cron['cron_file'] }}"
+    user: "{{ aide_cron['cron_user'] }}"
+    minute: "{{ aide_cron['aide_minute'] | default('0') }}"
+    hour: "{{ aide_cron['aide_hour'] | default('5') }}"
+    day: "{{ aide_cron['aide_day'] | default('*') }}"
+    month: "{{ aide_cron['aide_month'] | default('*') }}"
+    weekday: "{{ aide_cron['aide_weekday'] | default('*') }}"
+    job: "{{ aide_cron['aide_job'] }}"
+  when:
+    - rule_1_4_2|bool
+  tags:
+    - level1
+    - scored
+    - aide
+    - file_integrity
+    - patch
+    - rule_1.4.2
+
+- name: "1.5.1 | Ensure permissions on bootloader config are configured (Scored)"
+  stat:
+    path: /etc/grub2.cfg
+  register: grub_cfg
+  when:
+    - rule_1_5_1|bool
+  tags:
+    - level1
+    - scored
+    - grub
+    - patch
+    - rule_1.5.1
+
+- name: "1.5.1 | Ensure permissions on bootloader config are configured (Scored)"
+  file:
+    path: "{{ grub_cfg.stat.lnk_source }}"
+    owner: root
+    group: root
+    mode: 0600
+  when:
+    - grub_cfg.stat.exists and grub_cfg.stat.islnk
+    - rule_1_5_1|bool
+  tags:
+    - level1
+    - scored
+    - grub
+    - patch
+    - rule_1.5.1
+
+- name: "1.5.2 | Ensure bootloader password is set (Scored)" 
+  block:
+    - name: "1.5.2 | Ensure bootloader password is set (Scored) | Install Python Expect"
+      dnf: 
+        name: python3-pexpect
+        state: latest
+
+    - name: "1.5.2 | Ensure bootloader password is set (Scored) | Configure"
+      expect:
+        command: grub2-setpassword
+        responses:
+            (?i)password: "{{ bootloader_password }}"
+      notify: generate new grub config
+  when:
+    - rule_1_5_2
+  tags:
+    - level1
+    - scored
+    - section_1
+    - grub
+    - rule_1.5.2
+
+- name: "NOT1.5.3 | Ensure authentication required for single user mode (Scored)"
+  block:
+    - name: "NOT1.5.3 | Ensure authentication required for single user mode (Scored) - emergency"
+      lineinfile:
+        dest: /usr/lib/systemd/system/emergency.service
+        regexp: '/sbin/sulogin'
+        line: 'execstart=-/usr/lib/systemd/systemd-sulogin-shell rescue'
+
+    - name: "NOT1.5.3 | Ensure authentication required for single user mode (Scored) - rescue"
+      lineinfile:
+        dest: /usr/lib/systemd/system/rescue.service
+        regexp: '/sbin/sulogin'
+        line: 'execstart=-/usr/lib/systemd/systemd-sulogin-shell rescue'
+  when:
+    - rule_1_5_3
+    - ansible_distribution_major_version == 8
+  tags:
+    - level1
+    - level2
+    - section_1
+    - rule_1.5.3
+
+- name: "1.6.1 | Ensure core dumps are restricted (Scored)"
+  lineinfile:
+    state: present
+    dest: /etc/security/limits.conf
+    regexp: '^#?\\*.*core'
+    line: '*                hard    core            0'
+    insertbefore: '^# End of file'
+  when:
+    - rule_1_6_1|bool
+  tags:
+    - level1
+    - scored
+    - limits
+    - patch
+    - rule_1.6.1
+
+- name: "1.6.1 | Ensure core dumps are restricted (Scored)"
+  sysctl:
+    name: fs.suid_dumpable
+    value: '0'
+    state: present
+    reload: yes
+    sysctl_set: yes
+    ignoreerrors: yes
+  when:
+    - rule_1_6_1|bool
+  tags:
+    - level1
+    - scored
+    - sysctl
+    - patch
+    - rule_1.6.1
+
+- name: "1.6.2 | Ensure address space layout randomization (ASLR) is enabled (Scored)"
+  sysctl:
+    name: kernel.randomize_va_space
+    value: '2'
+    state: present
+    reload: yes
+    sysctl_set: yes
+    ignoreerrors: yes
+  when:
+    - rule_1_6_2|bool
+  tags:
+    - level1
+    - scored
+    - patch
+    - rule_1.6.2
+
+- name: "1.7.1.2 | Ensure SELinux is not disabled in bootloader configuration (Scored)"
+  replace:
+    dest: /etc/default/grub
+    regexp: '(selinux|enforcing)\s*=\s*0\s*'
+    follow: yes
+  register: selinux_grub_patch
+  ignore_errors: yes
+  notify: generate new grub config
+  when:
+    - selinux_state == "enforcing" 
+    - rule_1_7_1_2|bool
+  tags:
+    - level2
+    - scored
+    - patch
+    - rule_1.7.1.2
+
+###############################################
+#- name: "1.7.1.3 | Ensure SELinux policy is configured (Scored)"
+#  selinux:
+#    conf: /etc/selinux/config
+#    policy: "{{ selinux_policy }}"
+#    state: "{{ selinux_state }}"
+#  debug:
+#    msg: "--> Not relevant"
+#  changed_when: no
+#  when:
+#    - rule_1_7_1_3|bool
+#  tags:
+#    - level2
+#    - scored
+#    - selinux
+#    - patch
+#    - rule_1.7.1.3
+################################################
+- name: "1.7.1.4 | Ensure the SELinux state is enforcing (Scored)"
+  selinux:
+    conf: /etc/selinux/config
+    policy: "{{ selinux_policy }}"
+    state: "{{ selinux_state }}"
+  when:
+    - rule_1_7_1_4|bool
+  tags:
+    - level2
+    - scored
+    - selinux
+    - patch
+    - rule_1.7.1.4
+
+
+- name: "1.7.1.5 | Ensure no unconfined services exist (Scored)"
+  shell: ps -eZ | grep unconfined_service_t
+  changed_when: no
+  failed_when: no
+  when:
+    - rule_1_7_1_5|bool
+  tags:
+    - level2
+    - scored
+    - patch
+    - rule_1.7.1.5
+
+- name: "1.7.1.6 | Ensure SETroubleshoot is not installed (Scored)"
+  dnf:
+    name: setroubleshoot
+    state: absent
+  when:
+    - rule_1_7_1_6|bool
+  tags:
+    - level2
+    - scored
+    - selinux
+    - patch
+    - rule_1.7.1.6
+
+- name: "1.7.1.7 | Ensure the MCS Translation Service (mcstrans) is not installed (Scored)"
+  dnf:
+    name: mcstrans
+    state: absent
+  when:
+    - rule_1_7_1_7|bool
+  tags:
+    - level2
+    - scored
+    - patch
+    - rule_1.7.1.7
+
+- name: "1.7.1.1 | Ensure SELinux is installed"
+  package:
+    name: libselinux
+    state: present
+  when:
+    - rule_1_7_1_1|bool
+  tags:
+    - level2
+    - scored
+    - patch
+    - rule_1.7.1.1
+
+- name: "1.8.1.1 | Ensure message of the day is configured properly (Scored)"
+  template:
+    src: etc/motd.j2
+    dest: /etc/motd
+  when:
+    - rule_1_8_1_1|bool
+  tags:
+    - level1
+    - banner
+    - patch
+    - rule_1.8.1.1
+
+- name: "1.8.1.2 | Ensure local login warning banner is configured properly (Scored)"
+  template:
+    src: etc/issue.j2
+    dest: /etc/issue
+  when:
+    - rule_1_8_1_2|bool
+  tags:
+    - level1
+    - patch
+    - rule_1.8.1.2
+
+- name: "1.8.1.3 | Ensure remote login warning banner is configured properly (Scored)"
+  template:
+    src: etc/issue.net.j2
+    dest: /etc/issue.net
+  when:
+    - rule_1_8_1_3|bool
+  tags:
+    - level1
+    - banner
+    - patch
+    - rule_1.8.1.3
+
+- name: "1.8.1.4 | Ensure permissions on /etc/motd are configured (Scored)"
+  file:
+    dest: /etc/motd
+    state: file
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - rule_1_8_1_4|bool
+  tags:
+    - level1
+    - perms
+    - patch
+    - rule_1.8.1.4
+
+- name: "1.8.1.5 | Ensure permissions on /etc/issue are configured (Scored)"
+  file:
+    dest: /etc/issue
+    state: file
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - rule_1_8_1_5|bool
+  tags:
+    - level1
+    - perms
+    - patch
+    - rule_1.8.1.5
+
+- name: "1.8.1.6 | Ensure permissions on /etc/issue.net are configured (Scored)"
+  file:
+    dest: /etc/issue.net
+    state: file
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - rule_1_8_1_6|bool
+  tags:
+    - level1
+    - perms
+    - patch
+    - rule_1.8.1.6
+
+- name: "1.8.2 | Ensure GDM login banner is configured (Scored)"
+  lineinfile:
+    dest: "{{ item.file }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+    create: yes
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - { file: '/etc/dconf/profile/gdm', regexp: 'user-db', line: 'user-db:user' }
+    - { file: '/etc/dconf/profile/gdm', regexp: 'system-db', line: 'system-db:gdm' }
+    - { file: '/etc/dconf/profile/gdm', regexp: 'file-db', line: 'file-db:/usr/share/gdm/greeter-dconf-defaults' }
+    - { file: '/etc/dconf/db/gdm.d/01-banner-message', regexp: '\[org\/gnome\/login-screen\]', line: '[org/gnome/login-screen]' }
+    - { file: '/etc/dconf/db/gdm.d/01-banner-message', regexp: 'banner-message-enable', line: 'banner-message-enable=true' }
+    - { file: '/etc/dconf/db/gdm.d/01-banner-message', regexp: 'banner-message-text', line: "banner-message-text='{{ warning_banner }}' " }
+  when:
+    - gui|bool
+    - rule_1_8_2|bool
+  tags:
+    - level1
+    - level2
+    - patch
+    - rule_1.8.2
+
+- name: "1.9 | Ensure updates, patches, and additional security software are installed (Scored)"
+  dnf:
+    name: "*"
+    state: latest
+  when:
+    - rule_1_9
+  tags:
+    - level1
+    - level2
+    - section_1
+    - rule_1.9
+
+- name: "1.10 | Ensure system-wide crypto policy is not legacy (Scored)"
+  block:
+    - name: 1.10 | Ensure system-wide crypto policy is not legacy (Scored) | Check Current Crypto Policy
+      slurp:
+        src: /etc/crypto-policies/config
+      register: cryptopolicies
+
+    - name: 1.10 | Ensure system-wide crypto policy is not legacy (Scored) | Update if not to DEFAULT
+      command: update-crypto-policies --set DEFAULT
+      when:
+        - '"LEGACY" in cryptopolicies.content|b64decode'
+  when:
+    - rule_1_10
+  tags:
+    - level1
+    - level2
+    - section_1
+    - rule_1.10
+    - crypto
+
+- name: "1.11 | Ensure system-wide crypto policy is FUTURE or FIPS (Scored)"
+  shell: |
+    update-crypto-policies --set {{ crypto_policy }}
+    update-crypto-policies
+  when:
+    - rule_1_11|bool
+  tags:
+    - level1
+    - level2
+    - patch
+    - rule_1.11
+    - crypto

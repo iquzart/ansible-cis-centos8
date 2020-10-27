@@ -1,0 +1,16 @@
+---
+# handlers file for cis-centos
+
+- name: systemd restart tmp.mount
+  become: yes
+  systemd:
+      name: tmp.mount
+      daemon_reload: yes
+      enabled: yes
+      masked: no
+      state: reloaded
+
+- name: generate new grub config
+  become: yes
+  command: grub2-mkconfig -o "{{ grub_cfg.stat.lnk_source }}"
+

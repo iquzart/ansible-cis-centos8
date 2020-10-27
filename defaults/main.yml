@@ -1,0 +1,160 @@
+---
+# defaults file for cis-centos
+
+# 
+section_1: true
+section_2: true
+section_3: true
+section_4: true
+section_5: true
+section_6: true
+
+# Section 1 rules
+rule_1_1_1_1: true         # Ensure mounting of cramfs filesystems is disabled
+rule_1_1_1_2: true         # Ensure mounting of vFAT filesystems is disabled
+rule_1_1_1_3: true         # Ensure mounting of squashfs filesystems is disabled
+rule_1_1_1_4: true         # Ensure mounting of udf filesystems is disabled
+rule_1_1_2: true           # Ensure separate partition exists for /tmp | enable and start/restart tmp.mount
+rule_1_1_3: true          # Ensure nodev option set on /tmp partition
+rule_1_1_4: true          # Ensure nosuid option set on /tmp partition
+rule_1_1_5: true          # Ensure noexec option set on /tmp partition
+rule_1_1_6: true           # Ensure separate partition exists for /var
+rule_1_1_7: true           # Ensure separate partition exists for /var/tmp
+rule_1_1_8: true           # Ensure nodev option set on /var/tmp partition
+rule_1_1_9: true           # Ensure nosuid option set on /var/tmp partition
+rule_1_1_10: true          # Ensure noexec option set on /var/tmp partition
+rule_1_1_11: true          # Ensure separate partition exists for /var/log
+rule_1_1_12: true          # Ensure separate partition exists for /var/log/audit
+rule_1_1_13: true        # Ensure separate partition exists for /home
+rule_1_1_14: true         # Ensure nodev option set on /home
+rule_1_1_15: true          # Ensure nodev option set on /dev/shm partition
+rule_1_1_16: true          # Ensure nosuid option set on /dev/shm partition
+rule_1_1_17: true          # Ensure noexec option set on /dev/shm partition
+rule_1_1_18: true         # Ensure nodev option set on removable media partitions
+rule_1_1_19: true          # Ensure nosuid option set on removable media partitions
+rule_1_1_20: true          # Ensure noexec option set on removable media partitions
+rule_1_1_21: true          # Ensure sticky bit is set on all world-writable directories
+rule_1_1_22: true          # Diable automounting
+rule_1_1_23: false         # Disable USB Storage
+rule_1_2_1: true           # Ensure Red Hat Subscription Manager connection is configured
+rule_1_2_2: true           # Disable the RHNSD daemon
+rule_1_2_3: true           # Ensure gpg keys are configured
+rule_1_2_4: true           # Ensure gpgcheck is globally activated
+rule_1_2_5: true          # Ensure package manager repositories are configured
+rule_1_3_1: true           # Ensure sudo is installed
+rule_1_3_2: true           # Ensure sudo commands user pty
+rule_1_3_3: true           # Ensure sudo log file exists
+rule_1_4_1: true           # Ensure aide is installed
+rule_1_4_2: true           # Ensure filesystem integrity is regularly checked
+rule_1_5_1: true           # Ensure permissions on bootloader config are configured
+rule_1_5_2: true           # Ensure bootloader password is set --> not idempotent
+rule_1_5_3: true           # Ensure authentication required for single user mode
+rule_1_6_1: true           # Ensure core dumps are restricted
+rule_1_6_2: true           # Ensure address space layout randomization (ASLR) is enabled
+rule_1_7_1_1: true         # Ensure selinux is installed
+rule_1_7_1_2: true        # Ensure selinux is not disabled in bootloader configuration
+rule_1_7_1_3: true         # Ensure selinux policy is configured
+rule_1_7_1_4: true         # Ensure the selinux state is enforcing
+rule_1_7_1_5: true         # Ensure no unconfined services exist
+rule_1_7_1_6: true         # Ensure SETroubleshoot is not installed
+rule_1_7_1_7: true         # Ensure the MCS Translation Service (mcstrans) is not installed
+rule_1_8_1_1: true         # Ensure message of the day is configured properly
+rule_1_8_1_2: true         # Ensure local login warning banner is configured properly
+rule_1_8_1_3: true         # Ensure remote login warning banner is configured properly
+rule_1_8_1_4: true         # Ensure permissions on /etc/motd are configured
+rule_1_8_1_5: true         # Ensure permissions on /etc/issue are configured
+rule_1_8_1_6: true         # Ensure permissions on /etc/issue.net are configured
+rule_1_8_2: true           # Ensure GDM login banner is configured
+rule_1_9: false            # Ensure updates, patches, and additional security software are installed
+rule_1_10: true            # Ensure system-wide crypto policy is not legacy
+rule_1_11: true            # Ensure system-wide crypto policy is is FUTURE or FIPS --> not idempotent
+
+# Section 2 rules
+rule_2_1_1: true           # Ensure xinetd is not installed
+rule_2_2_1_1: true         # Ensure time synchronization is in use
+rule_2_2_1_2: true         # Ensure chrony is configured
+rule_2_2_2: true           # Ensure X Window System is not installed
+rule_2_2_3: true           # Ensure rsync service is not enabled
+rule_2_2_4: true           # Ensure Avahi Server is not enabled
+rule_2_2_5: true           # Ensure SNMP Server is not enabled"
+rule_2_2_6: true           # Ensure HTTP Proxy Server is not enabled
+rule_2_2_7: true           # Ensure Samba is not enabled
+rule_2_2_8: true           # Ensure IMAP and POP3 server is not enabled
+rule_2_2_9: true           # Ensure HTTP server is not enabled
+rule_2_2_10: true          # Ensure FTP server is not enabled
+rule_2_2_11: true          # Ensure DNS Server is not enabled
+rule_2_2_12: true          # Ensure NFS is not enabled
+rule_2_2_13: true          # Ensure RPC is not enabled
+rule_2_2_14: true          # Ensure LDAP service is not enabled
+rule_2_2_15: true          # Ensure DHCP is not enabled
+rule_2_2_16: true          # Ensure CUPS is not enabled
+rule_2_2_17: true          # Ensure NIS Server is not enabled 
+rule_2_2_18: true          # Ensure mail transfer agent is configured for local-only mode
+rule_2_3_1: true           # Ensure NIS Client is not installed
+rule_2_3_2: true           # Ensure telnet client is not installed
+rule_2_3_3: true           # Ensure LDAP client is not installed
+
+#####################################################################
+# 1.4.2 Bootloader password
+bootloader_password: random
+set_boot_pass: true
+
+# AIDE
+config_aide: true
+# AIDE cron settings
+aide_cron:
+  cron_user: root
+  cron_file: /etc/crontab
+  aide_job: '/usr/sbin/aide --check'
+  aide_minute: 0
+  aide_hour: 5
+  aide_day: '*'
+  aide_month: '*'
+  aide_weekday: '*'
+
+crypto_policy: FIPS #FUTURE
+
+# SELinux policy
+selinux_state: enforcing
+selinux_policy: targeted
+
+# Set to 'true' if X Windows is needed in your environment
+xwindows_required: false
+
+# Time Synchronization
+time_synchronization: chrony
+time_synchronization_servers:
+    - 0.pool.ntp.org
+    - 1.pool.ntp.org
+    - 2.pool.ntp.org
+    - 3.pool.ntp.org
+
+
+# Warning Banner Content (motd)
+warning_banner_motd: |
+    Authorized uses only. All activity may be monitored and reported.
+# End Banner
+
+# Warning Banner Content (issue, issue.net)
+warning_banner_issue: |
+  WARNING:   This system is for use of authorized users only.
+  Individuals using this computer system without authority, or in
+  excess of their authority, are subject to having all of their
+  activities on this system monitored and recorded by system personnel.
+
+  In the course of Monitoring individuals improperly using this system,
+  or in the course of system maintenance, the activity of authorized
+  users may also be monitored.
+  Anyone using this system expressly consents to such monitoring and is
+  adviced that if such monitoring reveals possible evidence of criminal
+  activity, system personnel may provide the evidence of such monitoring
+  to law enforcement officials.
+# End Banner
+
+vartmp:
+    source: /tmp
+    fstype: none
+    opts: "defaults,nodev,nosuid,noexec,bind"
+    enabled: no
+
+

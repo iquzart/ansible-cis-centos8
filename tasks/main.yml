@@ -1,0 +1,37 @@
+---
+# tasks file for cis-centos
+
+- name: Check OS version and family
+  fail:
+      msg: "This role can only be run agaist CentOS or RHEL. {{ ansible_distribution }} {{ ansible_distribution_major_version }} is not supported."
+  when:
+      - not ansible_os_family == "RedHat"
+      - not ansible_distribution_major_version == "8"
+  tags:
+      - always
+
+- name: Check ansible version
+  fail:
+      msg: You must use ansible 2.9 or greater!
+  when: not ansible_version.full is version_compare('2.9', '>=')
+  tags:
+      - always
+
+- name: "Set package facts"
+  package_facts:
+    manager: "auto"
+
+- name: "Set service facts"
+  service_facts:
+
+- include: section_1.yml
+  become: true
+  when: section_1
+  tags: 
+    - section_1
+
+- include: section_2.yml
+  become: true
+  when: section_2
+  tags: 
+    - section_2
