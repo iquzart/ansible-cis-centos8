@@ -85,7 +85,7 @@
     state: stopped
     enabled: no
   when:
-    - "'avahi-daemon' in ansible_facts.services"
+    - "'avahi-daemon.service' in ansible_facts.services"
     - rule_2_2_4
   tags:
     - section_2
@@ -191,11 +191,11 @@
 
 - name: "2.2.12 | Ensure NFS is not enabled"
   systemd:
-    name: nfs
+    name: nfs-server
     state: stopped
     enabled: no
   when:
-    - "'nfs.service' in ansible_facts.services"
+    - "'nfs-server.service' in ansible_facts.services"
     - rule_2_2_12
   tags:
     - section_2
