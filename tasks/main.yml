@@ -21,6 +21,10 @@
   package_facts:
     manager: "auto"
 
+- name: "Debug"
+  debug:
+    msg: "{{ ansible_facts.packages }}"
+
 - name: "Set service facts"
   service_facts:
 

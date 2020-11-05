@@ -96,11 +96,8 @@ rule_2_3_3: true           # Ensure LDAP client is not installed
 
 #####################################################################
 # 1.4.2 Bootloader password
-bootloader_password: random
+bootloader_password: p@ssw0rd
 set_boot_pass: true
-
-# GUI Enabled system 
-#gui_enabled: true
 
 # AIDE
 config_aide: true

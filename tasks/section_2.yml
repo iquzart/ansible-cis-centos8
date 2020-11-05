@@ -41,14 +41,22 @@
         state: absent
         name:
           - "xorg-x11*"
-          
+    
+    - name: Refresh destination information
+      setup:
+
+    - name: "Update service facts"
+      service_facts:
+
     - name: "Update package facts"
       package_facts:
         manager: "auto"
 
-    - name: "Update service facts"
-      service_facts:
+    - name: "Debug"
+      debug:
+        msg: "{{ ansible_facts.services }}"
   when:
+    - "'xorg-x11-server-common' in ansible_facts.packages"
     - rule_2_2_2
   tags:
     - section_2
@@ -56,7 +64,7 @@
     - scored
     - xwindows
     - rule_2.2.2  
-
+   
 
 - name: "2.2.3 | Ensure rsync service is not enabled "
   systemd:
@@ -253,7 +261,7 @@
     state: stopped
     enabled: no
   when:
-    - "'cups.service' in ansible_facts.services"
+    - "'cups' in ansible_facts.packages"
     - rule_2_2_16
   tags:
     - section_2
