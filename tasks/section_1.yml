@@ -562,22 +562,22 @@
     - grub
     - rule_1.5.2
 
-- name: "NOT1.5.3 | Ensure authentication required for single user mode (Scored)"
+- name: "1.5.3 | Ensure authentication required for single user mode (Scored)"
   block:
-    - name: "NOT1.5.3 | Ensure authentication required for single user mode (Scored) - emergency"
+    - name: "1.5.3 | Ensure authentication required for single user mode (Scored) - emergency"
       lineinfile:
         dest: /usr/lib/systemd/system/emergency.service
         regexp: '/sbin/sulogin'
         line: 'execstart=-/usr/lib/systemd/systemd-sulogin-shell rescue'
 
-    - name: "NOT1.5.3 | Ensure authentication required for single user mode (Scored) - rescue"
+    - name: "1.5.3 | Ensure authentication required for single user mode (Scored) - rescue"
       lineinfile:
         dest: /usr/lib/systemd/system/rescue.service
         regexp: '/sbin/sulogin'
         line: 'execstart=-/usr/lib/systemd/systemd-sulogin-shell rescue'
   when:
     - rule_1_5_3
-    - ansible_distribution_major_version == 8
+    - ansible_distribution_major_version == "8"
   tags:
     - level1
     - level2
