@@ -828,10 +828,10 @@
     - { file: '/etc/dconf/profile/gdm', regexp: 'file-db', line: 'file-db:/usr/share/gdm/greeter-dconf-defaults' }
     - { file: '/etc/dconf/db/gdm.d/01-banner-message', regexp: '\[org\/gnome\/login-screen\]', line: '[org/gnome/login-screen]' }
     - { file: '/etc/dconf/db/gdm.d/01-banner-message', regexp: 'banner-message-enable', line: 'banner-message-enable=true' }
-    - { file: '/etc/dconf/db/gdm.d/01-banner-message', regexp: 'banner-message-text', line: "banner-message-text='{{ warning_banner }}' " }
+    - { file: '/etc/dconf/db/gdm.d/01-banner-message', regexp: 'banner-message-text', line: "banner-message-text='Authorized uses only. All activity may be monitored and reported.'"  }
   when:
-    - gui|bool
-    - rule_1_8_2|bool
+    - not rule_2_2_2 | bool
+    - rule_1_8_2
   tags:
     - level1
     - level2

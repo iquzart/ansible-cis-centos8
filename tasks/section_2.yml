@@ -35,23 +35,13 @@
     - rule_2.2.1.2
 
 - name: "2.2.2 | Ensure X Window System is not installed"
-  package:
-    state: absent
-    name:
-      - "xorg-x11*"
-  when:
-    - not xwindows_required | bool
-    - "'xorg-x11' in ansible_facts.packages"
-    - rule_2_2_2
-  tags:
-    - section_2
-    - level1
-    - scored
-    - xwindows
-    - rule_2.2.2
-
-- name: "Update facts" 
   block:
+    - name: "2.2.2 | Ensure X Window System is not installed"
+      package:
+        state: absent
+        name:
+          - "xorg-x11*"
+          
     - name: "Update package facts"
       package_facts:
         manager: "auto"
@@ -59,8 +49,6 @@
     - name: "Update service facts"
       service_facts:
   when:
-    - not xwindows_required | bool
-    - "'xorg-x11' in ansible_facts.packages"
     - rule_2_2_2
   tags:
     - section_2

@@ -73,7 +73,7 @@ rule_1_11: true            # Ensure system-wide crypto policy is is FUTURE or FI
 rule_2_1_1: true           # Ensure xinetd is not installed
 rule_2_2_1_1: true         # Ensure time synchronization is in use
 rule_2_2_1_2: true         # Ensure chrony is configured
-rule_2_2_2: true           # Ensure X Window System is not installed
+rule_2_2_2: true          # Ensure X Window System is not installed
 rule_2_2_3: true           # Ensure rsync service is not enabled
 rule_2_2_4: true           # Ensure Avahi Server is not enabled
 rule_2_2_5: true           # Ensure SNMP Server is not enabled"
@@ -99,6 +99,9 @@ rule_2_3_3: true           # Ensure LDAP client is not installed
 bootloader_password: random
 set_boot_pass: true
 
+# GUI Enabled system 
+#gui_enabled: true
+
 # AIDE
 config_aide: true
 # AIDE cron settings
@@ -117,9 +120,6 @@ crypto_policy: FIPS #FUTURE
 # SELinux policy
 selinux_state: enforcing
 selinux_policy: targeted
-
-# Set to 'true' if X Windows is needed in your environment
-xwindows_required: false
 
 # Time Synchronization
 time_synchronization: chrony
