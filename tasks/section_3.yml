@@ -1,0 +1,504 @@
+- name: "3.1.1 | Ensure IP forwarding is disabled (Scored)"
+  sysctl:
+    name: '{{ item.name }}'
+    value: '{{ item.value }}'
+    sysctl_set: yes
+    state: present
+    reload: yes
+    ignoreerrors: yes
+  with_items:
+    - { name: net.ipv4.ip_forward, value: 0 }
+    - { name: net.ipv6.ip_forward, value: 0 }
+    - { name: net.ipv4.conf.all.ip_forward, value: 0 }
+    - { name: net.ipv6.conf.all.ip_forward, value: 0 }
+  when:
+    - rule_3_1_1
+  tags:
+    - level1
+    - sysctl
+    - rule_3.1.1
+    - section_3
+
+- name: "3.1.2 | Ensure packet redirect sending is disabled (Scored)"
+  sysctl:
+    name: '{{ item.name }}'
+    value: '{{ item.value }}'
+    sysctl_set: yes
+    state: present
+    reload: yes
+    ignoreerrors: yes
+  with_items:
+    - { name: net.ipv4.conf.all.send_redirects, value: 0 }
+    - { name: net.ipv4.conf.default.send_redirects, value: 0 }
+  when:
+    - rule_3_1_2
+  tags:
+    - level1
+    - sysctl
+    - rule_3.1.2
+    - section_3
+
+- name: "3.2.1 | Ensure source routed packets are not accepted (Scored)"
+  sysctl:
+    name: '{{ item.name }}'
+    value: '{{ item.value }}'
+    sysctl_set: yes
+    state: present
+    reload: yes
+    ignoreerrors: yes
+  with_items:
+    - { name: net.ipv4.conf.all.accept_source_route, value: 0 }
+    - { name: net.ipv4.conf.default.accept_source_route, value: 0 }
+    - { name: net.ipv6.conf.all.accept_source_route, value: 0 }
+    - { name: net.ipv6.conf.default.accept_source_route, value: 0 }
+  when:
+    - rule_3_2_1
+  tags:
+    - level1
+    - sysctl
+    - rule_3.2.1
+    - section_3
+
+- name: "3.2.2 | Ensure ICMP redirects are not accepted (Scored)"
+  sysctl:
+    name: '{{ item.name }}'
+    value: '{{ item.value }}'
+    sysctl_set: yes
+    state: present
+    reload: yes
+    ignoreerrors: yes
+  with_items:
+    - { name: net.ipv4.conf.all.accept_redirects, value: 0 }
+    - { name: net.ipv4.conf.default.accept_redirects, value: 0 }
+    - { name: net.ipv6.conf.all.accept_redirects, value: 0 }
+    - { name: net.ipv6.conf.default.accept_redirects, value: 0 }
+  when:
+    - rule_3_2_2
+  tags:
+    - level1
+    - sysctl
+    - rule_3.2.2
+    - section_3
+
+- name: "3.2.3 | Ensure secure ICMP redirects are not accepted (Scored)"
+  sysctl:
+    name: '{{ item.name }}'
+    value: '{{ item.value }}'
+    sysctl_set: yes
+    state: present
+    reload: yes
+    ignoreerrors: yes
+  with_items:
+    - { name: net.ipv4.conf.all.secure_redirects, value: 0 }
+    - { name: net.ipv4.conf.default.secure_redirects, value: 0 }
+  when:
+    - rule_3_2_3
+  tags:
+    - level1
+    - sysctl
+    - rule_3.2.3
+    - section_3
+
+- name: "3.2.4 | Ensure suspicious packets are logged (Scored)"
+  sysctl:
+    name: '{{ item.name }}'
+    value: '{{ item.value }}'
+    sysctl_set: yes
+    state: present
+    reload: yes
+    ignoreerrors: yes
+  with_items:
+    - { name: net.ipv4.conf.all.log_martians, value: 1 }
+    - { name: net.ipv4.conf.default.log_martians, value: 1 }
+  when:
+    - rule_3_2_4
+  tags:
+    - level1
+    - sysctl
+    - rule_3.2.4
+    - section_3
+
+- name: "3.2.5 | Ensure broadcast ICMP requests are ignored (Scored)"
+  sysctl:
+    name: net.ipv4.icmp_echo_ignore_broadcasts
+    value: "1"
+    state: present
+    reload: yes
+    ignoreerrors: yes
+  when:
+    - rule_3_2_5
+  tags:
+    - level1
+    - sysctl
+    - rule_3.2.5
+    - section_3
+
+- name: "3.2.6 | Ensure bogus ICMP responses are ignored (Scored)"
+  sysctl:
+    name: net.ipv4.icmp_ignore_bogus_error_responses
+    value: "1"
+    state: present
+    reload: yes
+    ignoreerrors: yes
+  when:
+    - rule_3_2_6
+  tags:
+    - level1
+    - sysctl
+    - rule_3.2.6
+    - section_3
+
+- name: "3.2.7 | Ensure Reverse Path Filtering is enabled (Scored)"
+  sysctl:
+    name: '{{ item.name }}'
+    value: '{{ item.value }}'
+    sysctl_set: yes
+    state: present
+    reload: yes
+    ignoreerrors: yes
+  with_items:
+    - { name: net.ipv4.conf.all.rp_filter, value: 1 }
+    - { name: net.ipv4.conf.default.rp_filter, value: 1 }
+  when:
+    - rule_3_2_7
+  tags:
+    - level1
+    - sysctl
+    - rule_3.2.7
+    - section_3
+
+- name: "3.2.8 | Ensure TCP SYN Cookies is enabled (Scored)"
+  sysctl:
+    name: net.ipv4.tcp_syncookies
+    value: "1"
+    state: present
+    reload: yes
+    ignoreerrors: yes
+  when:
+    - rule_3_2_8
+  tags:
+    - level1
+    - sysctl
+    - rule_3.2.8
+    - section_3
+
+- name: "3.2.9 | Ensure IPv6 router advertisements are not accepted (Scored)"
+  sysctl:
+    name: '{{ item.name }}'
+    value: '{{ item.value }}'
+    sysctl_set: yes
+    state: present
+    reload: yes
+    ignoreerrors: yes
+  with_items:
+    - { name: net.ipv6.conf.all.accept_ra, value: 0 }
+    - { name: net.ipv6.conf.default.accept_ra, value: 0 }
+  when:
+    - rule_3_2_9
+  tags:
+    - level1
+    - sysctl
+    - rule_3.2.9
+    - section_3
+
+- name: "3.3.1 | Ensure DCCP is disabled (Scored)"
+  lineinfile:
+    dest: /etc/modprobe.d/CIS.conf
+    regexp: "^(#)?install dccp(\\s|$)"
+    line: "install dccp /bin/true"
+    create: yes
+  when:
+    - rule_3_3_1
+  tags:
+    - level1
+    - rule_3.3.1
+    - section_3
+
+- name: "3.3.2 | Ensure SCTP is disabled (Scored)"
+  lineinfile:
+    dest: /etc/modprobe.d/CIS.conf
+    regexp: "^(#)?install sctp(\\s|$)"
+    line: "install sctp /bin/true"
+    create: yes
+  when:
+    - rule_3_3_2
+  tags:
+    - level1
+    - rule_3.3.2
+    - section_3
+
+- name: "3.3.3 | Ensure RDS is disabled (Scored)"
+  lineinfile:
+    dest: /etc/modprobe.d/CIS.conf
+    regexp: "^(#)?install rds(\\s|$)"
+    line: "install rds /bin/true"
+    create: yes
+  when:
+    - rule_3_3_3
+  tags:
+    - level1
+    - rule_3.3.3
+    - section_3
+
+- name: "3.3.4 | Ensure TIPC is disabled (Scored)"
+  lineinfile:
+    dest: /etc/modprobe.d/CIS.conf
+    regexp: "^(#)?install tipc(\\s|$)"
+    line: "install tipc /bin/true"
+    create: yes
+  when:
+    - rule_3_3_4
+  tags:
+    - level1
+    - rule_3.3.4
+    - section_3
+
+
+- name: "3.4.1.1 | Ensure a Firewall package is installed (Scored)"
+  dnf:
+    name: firewalld
+    state: present
+  when: 
+    - rule_3_4_1_1
+  tags:
+    - level1
+    - rule_3.4.1.1
+    - section_3
+
+- name: "3.4.2.1 | Ensure firewalld service is enabled and running (Scored)"
+  systemd:
+    name: firewalld
+    state: started
+    enabled: yes
+  when: 
+    - firewall == 'firewalld'
+    - rule_3_4_2_1
+  tags:
+    - level1
+    - rule_3.4.2.1
+    - section_3
+
+- name: "3.4.2.2 | Ensure iptables is not enabled (Scored)"
+  systemd:
+    name: iptables
+    enabled: no
+    masked: yes
+  when:
+    - packages['iptables-services'] is defined
+    - rule_3_4_2_2
+  tags:
+    - level1
+    - rule_3.4.2.2
+    - section_3
+
+- name: "3.4.2.3 | Ensure nftables is not enabled (Scored)"
+  systemd:
+    name: nftables
+    enabled: no
+    masked: yes
+  when:
+    - firewall == 'firewalld'  
+    - rule_3_4_2_3
+  tags:
+    - level1
+    - rule_3.4.2.3
+    - section_3
+
+- name: "3.4.2.4 | Ensure default zone is set (Scored)"
+  block:
+    - name: "Get default Firewalld zone"
+      command: firewall-cmd --get-default-zone
+      register: firewalld_zone
+
+    - name: "Set default Firewalld zone"
+      command: firewall-cmd --set-default-zone=public
+      when:
+        - firewalld_zone.stdout != "public"
+  when:
+    - firewall == 'firewalld'
+    - rule_3_4_2_4
+  tags:
+    - level1
+    - rule_3.4.2.4
+    - section_3
+
+- name: "3.4.2.5 | Ensure network interfaces are assigned to appropriate zone (Not Scored)"
+  command: /bin/true
+  when:
+    - firewall == 'firewalld'
+    - rule_3_4_2_5
+  tags:
+    - level1
+    - rule_3.4.2.5
+    - section_3
+
+- name: "3.4.2.6 | Ensure unnecessary services and ports are not accepted (Not Scored)"
+  command: /bin/true
+  when:
+    - firewall == 'firewalld'
+    - rule_3_4_2_6
+  tags:
+    - level1
+    - rule_3.4.2.6
+    - section_3
+
+- name: "3.4.3 | Configure nftables"
+  block:
+    - name: "3.4.3 | Configure nftables | Nftables Rules"
+      copy:
+        src: etc/nftables/nftables.rules
+        dest: /etc/nftables/nftables.rules
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: "3.4.3 | Configure nftables | Load Nftables Rules"
+      command: nft -f /etc/nftables/nftables.rules
+
+    - name: "3.4.3 | Configure nftables | Make Nftables Rules Permanent"
+      shell: nft list ruleset >  /etc/nftables/nftables.rules
+
+    - name: "3.4.3 | Configure nftables | Configure nftables.conf"
+      lineinfile:
+        dest: /etc/sysconfig/nftables.conf
+        regexp: ^(#)?include\s+"\/etc/nftables/nftables.rules\"
+        line: include "/etc/nftables/nftables.rules"
+  when:
+    - firewall == 'nftables'
+    - rule_3_4_3
+  tags:
+    - level1
+    - rule_3.4.3
+    - section_3
+    - notimplemented
+
+- name: "3.4.3.1 | Ensure iptables are flushed (Not Scored)"
+  iptables:
+    flush: yes
+  when:
+    - rule_3_4_3_1
+  tags:
+    - level1
+    - rule_3.4.3.1
+    - section_3
+
+- name: "3.4.3.2 | Ensure a table exists (Scored)"
+  command: /bin/true
+  changed_when: no
+  when:
+    - firewall == 'nftables'
+    - rule_3_4_3_2
+  tags:
+    - level1
+    - rule_3.4.3.2
+    - section_3
+
+- name: "3.4.3.3 | Ensure base chains exist (Scored)"
+  command: /bin/true
+  changed_when: no
+  when:
+    - firewall == 'nftables'
+    - rule_3_4_3_3
+  tags:
+    - level1
+    - rule_3.4.3.3
+    - section_3
+
+- name: "3.4.3.4 | Ensure loopback traffic is configured (Scored)"
+  command: /bin/true
+  changed_when: no
+  when:
+    - firewall == 'nftables'
+    - rule_3_4_3_4
+  tags:
+    - level1
+    - rule_3.4.3.4
+    - section_3
+
+- name: "3.4.3.5 | Ensure outbound and established connections are configured (Not Scored)"
+  command: /bin/true
+  changed_when: no
+  when:
+    - firewall == 'nftables'
+    - rule_3_4_3_5
+  tags:
+    - level1
+    - rule_3.4.3.5
+    - section_3
+
+- name: "3.4.3.6 | Ensure default deny firewall policy (Scored)"
+  command: /bin/true
+  changed_when: no
+  when:
+    - firewall == 'nftables'
+    - rule_3_4_3_6
+  tags:
+    - level1
+    - rule_3.4.3.6
+    - section_3
+
+- name: "3.4.3.7 | Ensure nftables service is enabled (Scored)"
+  systemd:
+    name: nftables
+    state: started
+    enabled: yes
+  when:
+    - firewall == 'nftables'
+    - rule_3_4_3_7
+  tags:
+    - level1
+    - rule_3.4.3.7
+    - section_3
+
+- name: "3.4.3.8 | Ensure nftables rules are permanent (Scored)"
+  command: /bin/true
+  changed_when: no
+  when:
+    - firewall == 'nftables'
+    - rule_3_4_3_8
+  tags:
+    - level1
+    - rule_3.4.3.8
+    - section_3
+
+- name: "3.5 | Ensure wireless interfaces are disabled (Scored)"
+  command: /bin/true
+  changed_when: no
+  when:
+    - rule_3_5
+  tags:
+    - level1
+    - rule_3.5
+    - section_3
+    - notimplemented
+
+- name: "3.6 | Disable IPv6 (Not Scored)"
+  block:
+    - name: "3.6 | Ensure permissions on bootloader config are configured"
+      stat:
+        path: /etc/grub2.cfg
+      register: grub_cfg
+
+    - name: "3.6 | Ensure permissions on bootloader config are configured"
+      file:
+        path: "{{ grub_cfg.stat.lnk_source }}"
+        owner: root
+        group: root
+        mode: 0600
+      when:
+        - grub_cfg.stat.exists and grub_cfg.stat.islnk
+
+    - name: "3.6 | Ensure permissions on bootloader config are configured"
+      replace:
+        dest: /etc/default/grub
+        regexp: '(^GRUB_CMDLINE_LINUX\s*\=\s*)(?:")(.+)(?<!ipv6.disable=1)(?:")'
+        replace: '\1"\2 ipv6.disable=1"'
+        follow: yes
+      ignore_errors: yes
+      notify: generate new grub config
+  when:
+    - rule_3_6
+  tags:
+    - level1
+    - rule_3.6
+    - section_3

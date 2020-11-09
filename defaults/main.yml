@@ -15,9 +15,9 @@ rule_1_1_1_2: true         # Ensure mounting of vFAT filesystems is disabled
 rule_1_1_1_3: true         # Ensure mounting of squashfs filesystems is disabled
 rule_1_1_1_4: true         # Ensure mounting of udf filesystems is disabled
 rule_1_1_2: true           # Ensure separate partition exists for /tmp | enable and start/restart tmp.mount
-rule_1_1_3: true          # Ensure nodev option set on /tmp partition
-rule_1_1_4: true          # Ensure nosuid option set on /tmp partition
-rule_1_1_5: true          # Ensure noexec option set on /tmp partition
+rule_1_1_3: true           # Ensure nodev option set on /tmp partition
+rule_1_1_4: true           # Ensure nosuid option set on /tmp partition
+rule_1_1_5: true           # Ensure noexec option set on /tmp partition
 rule_1_1_6: true           # Ensure separate partition exists for /var
 rule_1_1_7: true           # Ensure separate partition exists for /var/tmp
 rule_1_1_8: true           # Ensure nodev option set on /var/tmp partition
@@ -25,12 +25,12 @@ rule_1_1_9: true           # Ensure nosuid option set on /var/tmp partition
 rule_1_1_10: true          # Ensure noexec option set on /var/tmp partition
 rule_1_1_11: true          # Ensure separate partition exists for /var/log
 rule_1_1_12: true          # Ensure separate partition exists for /var/log/audit
-rule_1_1_13: true        # Ensure separate partition exists for /home
-rule_1_1_14: true         # Ensure nodev option set on /home
+rule_1_1_13: true          # Ensure separate partition exists for /home
+rule_1_1_14: true          # Ensure nodev option set on /home
 rule_1_1_15: true          # Ensure nodev option set on /dev/shm partition
 rule_1_1_16: true          # Ensure nosuid option set on /dev/shm partition
 rule_1_1_17: true          # Ensure noexec option set on /dev/shm partition
-rule_1_1_18: true         # Ensure nodev option set on removable media partitions
+rule_1_1_18: true          # Ensure nodev option set on removable media partitions
 rule_1_1_19: true          # Ensure nosuid option set on removable media partitions
 rule_1_1_20: true          # Ensure noexec option set on removable media partitions
 rule_1_1_21: true          # Ensure sticky bit is set on all world-writable directories
@@ -40,7 +40,7 @@ rule_1_2_1: true           # Ensure Red Hat Subscription Manager connection is c
 rule_1_2_2: true           # Disable the RHNSD daemon
 rule_1_2_3: true           # Ensure gpg keys are configured
 rule_1_2_4: true           # Ensure gpgcheck is globally activated
-rule_1_2_5: true          # Ensure package manager repositories are configured
+rule_1_2_5: true           # Ensure package manager repositories are configured
 rule_1_3_1: true           # Ensure sudo is installed
 rule_1_3_2: true           # Ensure sudo commands user pty
 rule_1_3_3: true           # Ensure sudo log file exists
@@ -52,7 +52,7 @@ rule_1_5_3: true           # Ensure authentication required for single user mode
 rule_1_6_1: true           # Ensure core dumps are restricted
 rule_1_6_2: true           # Ensure address space layout randomization (ASLR) is enabled
 rule_1_7_1_1: true         # Ensure selinux is installed
-rule_1_7_1_2: true        # Ensure selinux is not disabled in bootloader configuration
+rule_1_7_1_2: true         # Ensure selinux is not disabled in bootloader configuration
 rule_1_7_1_3: true         # Ensure selinux policy is configured
 rule_1_7_1_4: true         # Ensure the selinux state is enforcing
 rule_1_7_1_5: true         # Ensure no unconfined services exist
@@ -94,6 +94,42 @@ rule_2_3_1: true           # Ensure NIS Client is not installed
 rule_2_3_2: true           # Ensure telnet client is not installed
 rule_2_3_3: true           # Ensure LDAP client is not installed
 
+# Section 3 rules
+rule_3_1_1: true           # Ensure IP forwarding is disabled
+rule_3_1_2: true           # Ensure packet redirect sending is disabled
+rule_3_2_1: true           # Ensure source routed packets are not accepted
+rule_3_2_2: true           # Ensure ICMP redirects are not accepted
+rule_3_2_3: true           # Ensure secure ICMP redirects are not accepted
+rule_3_2_4: true           # Ensure suspicious packets are logged
+rule_3_2_5: true           # Ensure broadcast ICMP requests are ignored
+rule_3_2_6: true           # Ensure bogus ICMP responses are ignored
+rule_3_2_7: true           # Ensure Reverse Path Filtering is enabled
+rule_3_2_8: true           # Ensure TCP SYN Cookies is enabled
+rule_3_2_9: true           # Ensure IPv6 router advertisements are not accepted
+rule_3_3_1: true           # Ensure DCCP is disabled
+rule_3_3_2: true           # Ensure SCTP is disabled
+rule_3_3_3: true           # Ensure RDS is disabled
+rule_3_3_4: true           # Ensure TIPC is disabled
+rule_3_4_1_1: true         # Ensure a Firewall package is installed
+rule_3_4_2_1: true         # Ensure firewalld service is enabled and running
+rule_3_4_2_2: true         # Ensure iptables is not enabled
+rule_3_4_2_3: true         # Ensure nftables is not enabled
+rule_3_4_2_4: true         # Ensure default zone is set
+rule_3_4_2_5: true         # Ensure network interfaces are assigned to the appropriate zone
+rule_3_4_2_6: true         # Ensure unnessary services and ports are not accepted
+rule_3_4_3: true           # Configure nftables
+rule_3_4_3_1: true         # Ensure iptables are flushed
+rule_3_4_3_2: true         # Ensure a table exists
+rule_3_4_3_3: true         # Ensure base chains exist
+rule_3_4_3_4: true         # Ensure loopback traffic is configured
+rule_3_4_3_5: true         # Ensure outbound and established connections are configured
+rule_3_4_3_6: true         # Ensure default deny firewall policy
+rule_3_4_3_7: true         # Ensure nftables service is enabled
+rule_3_4_3_8: true         # Ensure nftables rules are permanent
+rule_3_5: true             # Ensure wireless interfaces are disabled
+rule_3_6: true             # Ensure IPv6 is disabled
+
+
 #####################################################################
 # 1.4.2 Bootloader password
 bootloader_password: p@ssw0rd
@@ -115,7 +151,7 @@ aide_cron:
 crypto_policy: FIPS #FUTURE
 
 # SELinux policy
-selinux_state: enforcing
+selinux_state: disabled #enforcing
 selinux_policy: targeted
 
 # Time Synchronization
@@ -154,4 +190,5 @@ vartmp:
     opts: "defaults,nodev,nosuid,noexec,bind"
     enabled: no
 
-
+# Firewall Configs
+firewall: firewalld      # Firewall module (firewalld, nftable)

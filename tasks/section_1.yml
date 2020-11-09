@@ -6,7 +6,7 @@
     line: "install cramfs /bin/true"
     create: yes
   when:
-    - rule_1_1_1_1|bool
+    - rule_1_1_1_1
   tags:
     - section_1
     - scored
@@ -17,7 +17,7 @@
     name: cramfs
     state: absent
   when:
-    - rule_1_1_1_1|bool
+    - rule_1_1_1_1
     - ansible_connection != 'docker'
   tags:
     - section_1
@@ -31,7 +31,7 @@
     line: "install vfat /bin/true"
     create: yes
   when:
-    - rule_1_1_1_2|bool
+    - rule_1_1_1_2
   tags:
     - section_1
     - not_scored
@@ -42,7 +42,7 @@
     name: vfat
     state: absent
   when:
-    - rule_1_1_1_2|bool
+    - rule_1_1_1_2
     - ansible_connection != 'docker'
   tags:
     - section_1
@@ -56,7 +56,7 @@
     line: "install squashfs /bin/true"
     create: yes
   when:
-    - rule_1_1_1_3|bool
+    - rule_1_1_1_3
   tags:
     - section_1
     - scored
@@ -67,7 +67,7 @@
     name: squashfs
     state: absent
   when:
-    - rule_1_1_1_3|bool
+    - rule_1_1_1_3
     - ansible_connection != 'docker'
   tags:
     - section_1
@@ -82,18 +82,18 @@
     line: "install udf /bin/true"
     create: yes
   when:
-    - rule_1_1_1_4|bool
+    - rule_1_1_1_4
   tags:
     - section_1
     - scored
     - udf
 
-- name: "1.1.1.4 | Remove udf module"
+- name: "1.1.1.4 | Remove udf module (Scored)"
   modprobe:
     name: udf
     state: absent
   when:
-    - rule_1_1_1_4|bool
+    - rule_1_1_1_4
     - ansible_connection != 'docker'
   tags:
     - section_1
@@ -101,7 +101,7 @@
     - udf
 
 
-- name: "1.1.2 | Ensure separate partition exists for /tmp | enable and start/restart tmp.mount"
+- name: "1.1.2 | Ensure separate partition exists for /tmp | enable and start/restart tmp.mount  (Scored)"
   systemd:
     name: tmp.mount
     daemon_reload: yes
@@ -109,13 +109,13 @@
     masked: no
     state: started
   when:
-    - rule_1_1_2|bool
+    - rule_1_1_2
   tags:
     - section_1
     - scored
     - rule_1.1.2
 
-- name: "1.1.3 | 1.1.4 | 1.1.5 | Ensure nodev,nosuid,noexec options set on /tmp partition"
+- name: "1.1.3 | 1.1.4 | 1.1.5 | Ensure nodev,nosuid,noexec options set on /tmp partition (Scored)"
   template:
     src: tmp.mount.j2
     dest: /etc/systemd/system/tmp.mount
@@ -123,9 +123,9 @@
     group: root
     mode: 0644
   notify: systemd restart tmp.mount
-  when: rule_1_1_3|bool or 
-        rule_1_1_4|bool or 
-        rule_1_1_5|bool
+  when: rule_1_1_3 or 
+        rule_1_1_4 or 
+        rule_1_1_5
   tags:
     - section_1
     - scored
@@ -175,9 +175,9 @@
     fstype: "{{ vartmp['fstype'] }}"
     opts: "{{ vartmp['opts'] }}"
   when:
-    - rule_1_1_8|bool
-    - rule_1_1_9|bool
-    - rule_1_1_10|bool
+    - rule_1_1_8
+    - rule_1_1_9
+    - rule_1_1_10
   tags:
     - level1
     - scored
@@ -226,7 +226,7 @@
   changed_when: no
   failed_when: no
   when:
-    - rule_1_1_13|bool
+    - rule_1_1_13
   tags:
     - level2
     - scored
@@ -242,7 +242,7 @@
     fstype: "{{ item.fstype }}"
     opts: "nodev"
   when:
-    - rule_1_1_14|bool
+    - rule_1_1_14
     - item.mount == "/home"
   with_items: "{{ ansible_mounts }}"
   tags:
@@ -327,7 +327,7 @@
     enabled: no
   when:
     - "'autofs.service' in ansible_facts.services"
-    - rule_1_1_22|bool
+    - rule_1_1_22
   tags:
     - level1
     - patch
@@ -337,7 +337,7 @@
   command: rmmod usb-storage
   ignore_errors: yes
   when:
-    - rule_1_1_23|bool
+    - rule_1_1_23
   tags:
     - level1
     - scored
@@ -464,7 +464,7 @@
     name: aide
     state: present
   when:
-    - rule_1_4_1|bool
+    - rule_1_4_1
   tags:
     - level1
     - scored
@@ -481,8 +481,8 @@
   async: 45
   poll: 0
   when:
-    - config_aide|bool
-    - rule_1_4_1|bool
+    - config_aide
+    - rule_1_4_1
   tags:
     - level1
     - scored
@@ -502,7 +502,7 @@
     weekday: "{{ aide_cron['aide_weekday'] | default('*') }}"
     job: "{{ aide_cron['aide_job'] }}"
   when:
-    - rule_1_4_2|bool
+    - rule_1_4_2
   tags:
     - level1
     - scored
@@ -516,7 +516,7 @@
     path: /etc/grub2.cfg
   register: grub_cfg
   when:
-    - rule_1_5_1|bool
+    - rule_1_5_1 | bool
   tags:
     - level1
     - scored
@@ -532,7 +532,7 @@
     mode: 0600
   when:
     - grub_cfg.stat.exists and grub_cfg.stat.islnk
-    - rule_1_5_1|bool
+    - rule_1_5_1
   tags:
     - level1
     - scored
@@ -592,7 +592,7 @@
     line: '*                hard    core            0'
     insertbefore: '^# End of file'
   when:
-    - rule_1_6_1|bool
+    - rule_1_6_1
   tags:
     - level1
     - scored
@@ -609,7 +609,7 @@
     sysctl_set: yes
     ignoreerrors: yes
   when:
-    - rule_1_6_1|bool
+    - rule_1_6_1
   tags:
     - level1
     - scored
@@ -626,7 +626,7 @@
     sysctl_set: yes
     ignoreerrors: yes
   when:
-    - rule_1_6_2|bool
+    - rule_1_6_2
   tags:
     - level1
     - scored
@@ -643,7 +643,7 @@
   notify: generate new grub config
   when:
     - selinux_state == "enforcing" 
-    - rule_1_7_1_2|bool
+    - rule_1_7_1_2
   tags:
     - level2
     - scored
@@ -660,7 +660,7 @@
 #    msg: "--> Not relevant"
 #  changed_when: no
 #  when:
-#    - rule_1_7_1_3|bool
+#    - rule_1_7_1_3
 #  tags:
 #    - level2
 #    - scored
@@ -674,7 +674,7 @@
     policy: "{{ selinux_policy }}"
     state: "{{ selinux_state }}"
   when:
-    - rule_1_7_1_4|bool
+    - rule_1_7_1_4
   tags:
     - level2
     - scored
@@ -688,7 +688,7 @@
   changed_when: no
   failed_when: no
   when:
-    - rule_1_7_1_5|bool
+    - rule_1_7_1_5
   tags:
     - level2
     - scored
@@ -700,7 +700,7 @@
     name: setroubleshoot
     state: absent
   when:
-    - rule_1_7_1_6|bool
+    - rule_1_7_1_6
   tags:
     - level2
     - scored
@@ -713,7 +713,7 @@
     name: mcstrans
     state: absent
   when:
-    - rule_1_7_1_7|bool
+    - rule_1_7_1_7
   tags:
     - level2
     - scored
@@ -725,7 +725,7 @@
     name: libselinux
     state: present
   when:
-    - rule_1_7_1_1|bool
+    - rule_1_7_1_1
   tags:
     - level2
     - scored
@@ -737,7 +737,7 @@
     src: etc/motd.j2
     dest: /etc/motd
   when:
-    - rule_1_8_1_1|bool
+    - rule_1_8_1_1
   tags:
     - level1
     - banner
@@ -749,7 +749,7 @@
     src: etc/issue.j2
     dest: /etc/issue
   when:
-    - rule_1_8_1_2|bool
+    - rule_1_8_1_2
   tags:
     - level1
     - patch
@@ -760,7 +760,7 @@
     src: etc/issue.net.j2
     dest: /etc/issue.net
   when:
-    - rule_1_8_1_3|bool
+    - rule_1_8_1_3
   tags:
     - level1
     - banner
@@ -775,7 +775,7 @@
     group: root
     mode: 0644
   when:
-    - rule_1_8_1_4|bool
+    - rule_1_8_1_4
   tags:
     - level1
     - perms
@@ -790,7 +790,7 @@
     group: root
     mode: 0644
   when:
-    - rule_1_8_1_5|bool
+    - rule_1_8_1_5
   tags:
     - level1
     - perms
@@ -805,7 +805,7 @@
     group: root
     mode: 0644
   when:
-    - rule_1_8_1_6|bool
+    - rule_1_8_1_6
   tags:
     - level1
     - perms
@@ -875,7 +875,7 @@
     update-crypto-policies --set {{ crypto_policy }}
     update-crypto-policies
   when:
-    - rule_1_11|bool
+    - rule_1_11
   tags:
     - level1
     - level2

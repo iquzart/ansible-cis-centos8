@@ -176,7 +176,7 @@
     - scored
     - rule_2.2.10
 
-- name: "2.2.11 | Ensure DNS Server is not enabled"
+- name: "2.2.11 | Ensure DNS Server is not enabled (Scored)"
   systemd:
     name: named
     state: stopped
@@ -189,7 +189,7 @@
     - level1
     - rule_2.2.11
 
-- name: "2.2.12 | Ensure NFS is not enabled"
+- name: "2.2.12 | Ensure NFS is not enabled (Scored)"
   systemd:
     name: nfs-server
     state: stopped
@@ -206,7 +206,7 @@
     - services
     - rule_2.2.12
 
-- name: "2.2.13 | Ensure RPC is not enabled"
+- name: "2.2.13 | Ensure RPC is not enabled (Scored)"
   systemd:
     name: rpcbind
     state: stopped
@@ -223,7 +223,7 @@
     - services
     - rule_2.2.13
 
-- name: "2.2.14 | Ensure LDAP server is not enabled"
+- name: "2.2.14 | Ensure LDAP server is not enabled (Scored)"
   service:
     name: slapd
     state: stopped
@@ -239,7 +239,7 @@
     - services
     - rule_2.2.14
 
-- name: "2.2.15 | Ensure DHCP Server is not enabled"
+- name: "2.2.15 | Ensure DHCP Server is not enabled (Scored)"
   systemd:
     name: dhcpd
     state: stopped
@@ -255,7 +255,7 @@
     - services
     - rule_2.2.14
 
-- name: "2.2.16 | Ensure CUPS is not enabled"
+- name: "2.2.16 | Ensure CUPS is not enabled (Scored)"
   systemd:
     name: cups
     state: stopped
@@ -271,7 +271,7 @@
     - services
     - rule_2.2.16
 
-- name: "2.2.17 | Ensure NIS Server is not enabled"
+- name: "2.2.17 | Ensure NIS Server is not enabled (Scored)"
   systemd:
     name: ypserv
     state: stopped
@@ -284,7 +284,7 @@
     - level1
     - rule_2.2.17
 
-- name: "2.2.18 | Ensure mail transfer agent is configured for local-only mode"
+- name: "2.2.18 | Ensure mail transfer agent is configured for local-only mode (Scored)"
   lineinfile:
     dest: /etc/postfix/main.cf
     regexp: "^(#)?inet_interfaces"
@@ -297,7 +297,7 @@
     - level1
     - rule_2.2.18
 
-- name: "2.3.1 | Ensure NIS Client is not installed"
+- name: "2.3.1 | Ensure NIS Client is not installed (Scored)"
   dnf:
     name: ypbind
     state: absent
@@ -309,7 +309,7 @@
     - level1
     - rule_2.3.1
 
-- name: "2.3.2 | Ensure telnet client is not installed"
+- name: "2.3.2 | Ensure telnet client is not installed (Scored)"
   dnf:
     name: telnet
     state: absent
@@ -321,7 +321,7 @@
     - level1
     - rule_2.3.2
 
-- name: "2.3.3 | Ensure LDAP client is not installed"
+- name: "2.3.3 | Ensure LDAP client is not installed (Scored)"
   dnf:
     name: openldap-clients
     state: absent
