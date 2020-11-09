@@ -225,3 +225,11 @@ vartmp:
 
 # Firewall Configs
 firewall: firewalld      # Firewall module (firewalld, nftable)
+
+# Log
+logrotate: "daily"
+rsyslog_dest: x.x.x.x
+auditd:
+    admin_space_left_action: halt     # Halts the system when the audit logs are ful 
+    max_log_file_action: keep_logs    # Handle the audit log file reaching the max file size. A value of keep_logs will rotate the logs but never delete old logs.
+    max_log_file: 10                  # Configure the maximum size (MB of audit log file.

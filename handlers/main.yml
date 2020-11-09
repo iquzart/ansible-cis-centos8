@@ -12,5 +12,14 @@
 
 - name: generate new grub config
   become: yes
-  command: grub2-mkconfig -o "{{ grub_cfg.stat.lnk_source }}"
+  command: grub2-mkconfig -o /boot/grub2/grub.cfg
 
+- name: reload dconf
+  become: yes
+  command: dconf update
+
+- name: restart auditd
+  become: yes
+  service:
+      name: auditd
+      state: restarted

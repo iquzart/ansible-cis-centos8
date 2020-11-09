@@ -828,6 +828,7 @@
   when:
     - not rule_2_2_2 | bool
     - rule_1_8_2
+  notify: reload dconf
   tags:
     - level1
     - level2
