@@ -12,13 +12,12 @@
     - scored
     - cramfs
 
-- name: "1.1.1.1 | Remove cramfs module"
+- name: "1.1.1.1 | Remove cramfs module (Scored)"
   modprobe:
     name: cramfs
     state: absent
   when:
     - rule_1_1_1_1
-    - ansible_connection != 'docker'
   tags:
     - section_1
     - scored
@@ -43,7 +42,6 @@
     state: absent
   when:
     - rule_1_1_1_2
-    - ansible_connection != 'docker'
   tags:
     - section_1
     - not_scored
@@ -62,13 +60,12 @@
     - scored
     - squashfs
 
-- name: "1.1.1.3 | Remove squashfs module"
+- name: "1.1.1.3 | Remove squashfs module (Scored)"
   modprobe:
     name: squashfs
     state: absent
   when:
     - rule_1_1_1_3
-    - ansible_connection != 'docker'
   tags:
     - section_1
     - scored
@@ -94,7 +91,6 @@
     state: absent
   when:
     - rule_1_1_1_4
-    - ansible_connection != 'docker'
   tags:
     - section_1
     - scored

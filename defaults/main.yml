@@ -151,7 +151,7 @@ aide_cron:
 crypto_policy: FIPS #FUTURE
 
 # SELinux policy
-selinux_state: disabled #enforcing
+selinux_state: enforcing
 selinux_policy: targeted
 
 # Time Synchronization
