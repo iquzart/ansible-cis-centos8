@@ -41,3 +41,9 @@
   when: section_3
   tags: 
     - section_3
+
+- include: section_4.yml
+  become: true
+  when: section_4
+  tags: 
+    - section_4
