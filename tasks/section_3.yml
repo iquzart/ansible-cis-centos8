@@ -473,32 +473,16 @@
     - notimplemented
 
 - name: "3.6 | Disable IPv6 (Not Scored)"
-  block:
-    - name: "3.6 | Ensure permissions on bootloader config are configured"
-      stat:
-        path: /etc/grub2.cfg
-      register: grub_cfg
-
-    - name: "3.6 | Ensure permissions on bootloader config are configured"
-      file:
-        path: "{{ grub_cfg.stat.lnk_source }}"
-        owner: root
-        group: root
-        mode: 0600
-      when:
-        - grub_cfg.stat.exists and grub_cfg.stat.islnk
-
-    - name: "3.6 | Ensure permissions on bootloader config are configured"
-      replace:
-        dest: /etc/default/grub
-        regexp: '(^GRUB_CMDLINE_LINUX\s*\=\s*)(?:")(.+)(?<!ipv6.disable=1)(?:")'
-        replace: '\1"\2 ipv6.disable=1"'
-        follow: yes
-      ignore_errors: yes
-      notify: generate new grub config
+  replace:
+    dest: /etc/default/grub
+    regexp: '(^GRUB_CMDLINE_LINUX\s*\=\s*)(?:")(.+)(?<!ipv6.disable=1)(?:")'
+    replace: '\1"\2 ipv6.disable=1"'
+    follow: yes
+  ignore_errors: yes
+  notify: generate new grub config
   when:
     - rule_3_6
   tags:
-    - level1
+    - level2
     - rule_3.6
     - section_3

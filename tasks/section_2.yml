@@ -1,5 +1,5 @@
 ---
-- name: "2.1.1 | Ensure xinetd is not installed"
+- name: "2.1.1 | Ensure xinetd is not installed (Scored)"
   dnf:
     name: xinetd
     state: absent
@@ -11,7 +11,7 @@
     - scored
     - rule_2.1.1
 
-- name: "2.2.1.1 | Ensure time synchronization is in use"
+- name: "2.2.1.1 | Ensure time synchronization is in use (Not Scored)"
   dnf:
     name: chrony
     state: present
@@ -20,7 +20,7 @@
     - level1
     - rule_2.2.1.1
 
-- name: "2.2.1.2 | Ensure chrony is configured"
+- name: "2.2.1.2 | Ensure chrony is configured (Scored)"
   template:
     src: etc/chrony.conf.j2
     dest: /etc/chrony.conf
@@ -34,9 +34,9 @@
     - level1
     - rule_2.2.1.2
 
-- name: "2.2.2 | Ensure X Window System is not installed"
+- name: "2.2.2 | Ensure X Window System is not installed (Scored)"
   block:
-    - name: "2.2.2 | Ensure X Window System is not installed"
+    - name: "2.2.2 | Ensure X Window System is not installed (Scored)"
       package:
         state: absent
         name:
@@ -66,7 +66,7 @@
     - rule_2.2.2  
    
 
-- name: "2.2.3 | Ensure rsync service is not enabled "
+- name: "2.2.3 | Ensure rsync service is not enabled (Scored)"
   systemd:
     name: rsyncd
     state: stopped
@@ -79,7 +79,7 @@
     - level1
     - rule_2.2.3
 
-- name: "2.2.4 | Ensure Avahi Server is not enabled"
+- name: "2.2.4 | Ensure Avahi Server is not enabled (Scored)"
   systemd:
     name: avahi-daemon
     state: stopped
@@ -95,7 +95,7 @@
     - services
     - rule_2.2.4
 
-- name: "2.2.5 | Ensure SNMP Server is not enabled"
+- name: "2.2.5 | Ensure SNMP Server is not enabled (Scored)"
   systemd:
     name: snmpd
     state: stopped
@@ -108,7 +108,7 @@
     - level1
     - rule_2.2.5
 
-- name: "2.2.6 | Ensure HTTP Proxy Server is not enabled"
+- name: "2.2.6 | Ensure HTTP Proxy Server is not enabled (Scored)"
   systemd:
     name: squid
     state: stopped
@@ -121,7 +121,7 @@
     - level1
     - rule_2.2.6
 
-- name: "2.2.7 | Ensure Samba is not enabled"
+- name: "2.2.7 | Ensure Samba is not enabled (Scored)"
   systemd:
     name: smb
     state: stopped
@@ -134,7 +134,7 @@
     - level1
     - rule_2.2.7
 
-- name: "2.2.8 | Ensure IMAP and POP3 server is not enabled"
+- name: "2.2.8 | Ensure IMAP and POP3 server is not enabled (Scored)"
   systemd:
     name: dovecot
     state: stopped
