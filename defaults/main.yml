@@ -129,6 +129,39 @@ rule_3_4_3_8: true         # Ensure nftables rules are permanent
 rule_3_5: true             # Ensure wireless interfaces are disabled
 rule_3_6: true             # Ensure IPv6 is disabled
 
+# Section 4 rules
+rule_4_1_1_1: true         # Ensure auditd is installed
+rule_4_1_1_2: true         # Ensure auditd service is enabled
+rule_4_1_1_3: true         # Ensure auditing for processes that start prior to auditd is enabled
+rule_4_1_2_1: true         # Ensure audit log storage size is configured
+rule_4_1_2_2: true         # Ensure audit logs are not automatically deleted
+rule_4_1_2_3: true         # Ensure system is disabled when audit logs are full
+rule_4_1_3: true           # Ensure changes to system administration scope (sudoers) is collected
+rule_4_1_4: true           # Ensure login and logout events are collected (Scored)
+rule_4_1_5: true           # Ensure session initiation information is collected (Scored)
+rule_4_1_6: true           # Ensure events that modify date and time information are collected
+rule_4_1_7: true           # Ensure events that modify the system's Mandatory Access Controls are collected
+rule_4_1_8: true           # Ensure events that modify the system's network environment are collected
+rule_4_1_9: true           # Ensure discretionary access control permission modification events are collected
+rule_4_1_10: true          # Ensure unsuccessful unauthorized file access attempts are collected
+rule_4_1_11: true          # Ensure events that modify user/group information are collected
+rule_4_1_12: true          # Ensure successful file system mounts are collected
+rule_4_1_13: true          # Ensure use of privileged commands is collected
+rule_4_1_14: true          # Ensure file deletion events by users are collected
+rule_4_1_15: true          # Ensure kernel module loading and unloading is collected
+rule_4_1_16: true          # Ensure system administrator actions (sudolog) are collected
+rule_4_1_17: true          # Ensure the audit configuration is immutable
+rule_4_2_1_1: true         # Ensure rsyslog is installed
+rule_4_2_1_2: true         # Ensure rsyslog Service is enabled
+rule_4_2_1_3: true         # Ensure rsyslog default file permissions configured
+rule_4_2_1_4: true         # Ensure logging is configured
+rule_4_2_1_5: false        # Ensure rsyslog is configured to send logs to a remote log host
+rule_4_2_1_6: true         # Ensure remote rsyslog messages are only accepted on designated log hosts
+rule_4_2_2_1: true         # Ensure journald is configured to send logs to rsyslog
+rule_4_2_2_2: true         # Ensure journald is configured to compress large log files
+rule_4_2_2_3: true         # Ensure journald is configured to write logfiles to persistent disk
+rule_4_2_3: true           # Ensure permissions on all logfiles are configured
+rule_4_3: true             # Ensure logrotate is configured
 
 #####################################################################
 # 1.4.2 Bootloader password
