@@ -850,14 +850,15 @@
     - name: 1.10 | Ensure system-wide crypto policy is not legacy (Scored) | Check Current Crypto Policy
       slurp:
         src: /etc/crypto-policies/config
-      register: cryptopolicies
+      register: crypto_policy
 
     - name: 1.10 | Ensure system-wide crypto policy is not legacy (Scored) | Update if not to DEFAULT
       command: update-crypto-policies --set DEFAULT
       when:
-        - '"LEGACY" in cryptopolicies.content|b64decode'
+        - '"LEGACY" in crypto_policy.content|b64decode'
   when:
     - rule_1_10
+    - rule_1_11
   tags:
     - level1
     - level2
@@ -871,6 +872,7 @@
     update-crypto-policies
   when:
     - rule_1_11
+    - crypto_policy.stdout == 'DEFAULT' or crypto_policy.stdout == 'LEGACY'
   tags:
     - level1
     - level2
