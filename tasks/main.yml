@@ -47,3 +47,15 @@
   when: section_4
   tags: 
     - section_4
+
+- include: section_5.yml
+  become: true
+  when: section_5
+  tags: 
+    - section_5
+
+- include: section_6.yml
+  become: true
+  when: section_6
+  tags: 
+    - section_6

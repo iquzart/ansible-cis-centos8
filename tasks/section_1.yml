@@ -1,7 +1,7 @@
 ---
 - name: "1.1.1.1 | Ensure mounting of cramfs filesystems is disabled (Scored)"
   lineinfile:
-    dest: /etc/modprobe.d/CIS.conf
+    dest: /etc/modprobe.d/cis.conf
     regexp: "^(#)?install cramfs(\\s|$)"
     line: "install cramfs /bin/true"
     create: yes
@@ -25,7 +25,7 @@
 
 - name: "1.1.1.2 | Ensure mounting of vFAT filesystems is limited (Not Scored)"
   lineinfile:
-    dest: /etc/modprobe.d/CIS.conf
+    dest: /etc/modprobe.d/cis.conf
     regexp: "^(#)?install vfat(\\s|$)"
     line: "install vfat /bin/true"
     create: yes
@@ -49,7 +49,7 @@
 
 - name: "1.1.1.3 | Ensure mounting of squashfs filesystems is disabled (Scored)"
   lineinfile:
-    dest: /etc/modprobe.d/CIS.conf
+    dest: /etc/modprobe.d/cis.conf
     regexp: "^(#)?install squashfs(\\s|$)"
     line: "install squashfs /bin/true"
     create: yes
@@ -74,7 +74,7 @@
 
 - name: "1.1.1.4 | Ensure mounting of udf filesystems is disabled (Scored)"
   lineinfile:
-    dest: /etc/modprobe.d/CIS.conf
+    dest: /etc/modprobe.d/cis.conf
     regexp: "^(#)?install udf(\\s|$)"
     line: "install udf /bin/true"
     create: yes
@@ -118,7 +118,7 @@
     owner: root
     group: root
     mode: 0644
-  notify: systemd restart tmp.mount
+#  notify: systemd restart tmp.mount
   when: rule_1_1_3 or 
         rule_1_1_4 or 
         rule_1_1_5
@@ -165,19 +165,21 @@
          1.1.9  | Ensure nosuid option set on /var/tmp partition (Scored)\n
          1.1.10 | Ensure noexec option set on /var/tmp partition (Scored)"
   mount:
-    name: /var/tmp
-    src: "{{ vartmp['source'] }}"
-    state: present
-    fstype: "{{ vartmp['fstype'] }}"
-    opts: "{{ vartmp['opts'] }}"
+    name: "/var/tmp"
+    src: "{{ item.device }}"
+    state: mounted
+    fstype: "{{ item.fstype }}"
+    opts: "defaults{% if rule_1_1_8 %},nodev{% endif %}{% if  rule_1_1_9 %},nosuid{% endif %}{% if rule_1_1_10 %},noexec{% endif %}"
+  with_items: "{{ ansible_mounts }}"
   when:
-    - rule_1_1_8
-    - rule_1_1_9
-    - rule_1_1_10
+    - item.mount == "/var/tmp"
+    - rule_1_1_7
+    - rule_1_1_8 or rule_1_1_9 or rule_1_1_10  
   tags:
     - level1
     - scored
     - patch
+    - rule_1.1.7
     - rule_1.1.8
     - rule_1.1.9
     - rule_1.1.10
@@ -330,8 +332,15 @@
     - rule_1.1.22
 
 - name: "1.1.23 | Disable USB Storage (Scored)"
-  command: rmmod usb-storage
-  ignore_errors: yes
+  lineinfile:
+    dest: /etc/modprobe.d/cis.conf
+    regexp: "^(#)?\\s*install\\s+usb-storage(\\s*|$)"
+    line: "install usb-storage /bin/true"
+    state: present
+    owner: root
+    group: root
+    mode: 0644
+    create: true
   when:
     - rule_1_1_23
   tags:
@@ -809,26 +818,15 @@
     - rule_1.8.1.6
 
 - name: "1.8.2 | Ensure GDM login banner is configured (Scored)"
-  lineinfile:
-    dest: "{{ item.file }}"
-    regexp: "{{ item.regexp }}"
-    line: "{{ item.line }}"
-    state: present
-    create: yes
+  template:
+    src: etc/dm3/greeter.dconf-defaults.j2
+    dest: /etc/dm3/greeter.dconf-defaults
     owner: root
     group: root
     mode: 0644
-  with_items:
-    - { file: '/etc/dconf/profile/gdm', regexp: 'user-db', line: 'user-db:user' }
-    - { file: '/etc/dconf/profile/gdm', regexp: 'system-db', line: 'system-db:gdm' }
-    - { file: '/etc/dconf/profile/gdm', regexp: 'file-db', line: 'file-db:/usr/share/gdm/greeter-dconf-defaults' }
-    - { file: '/etc/dconf/db/gdm.d/01-banner-message', regexp: '\[org\/gnome\/login-screen\]', line: '[org/gnome/login-screen]' }
-    - { file: '/etc/dconf/db/gdm.d/01-banner-message', regexp: 'banner-message-enable', line: 'banner-message-enable=true' }
-    - { file: '/etc/dconf/db/gdm.d/01-banner-message', regexp: 'banner-message-text', line: "banner-message-text='Authorized uses only. All activity may be monitored and reported.'"  }
   when:
-    - not rule_2_2_2 | bool
+    - "'gdm' in ansible_facts.packages"
     - rule_1_8_2
-  notify: reload dconf
   tags:
     - level1
     - level2

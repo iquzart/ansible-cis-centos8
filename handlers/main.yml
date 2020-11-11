@@ -14,9 +14,9 @@
   become: yes
   command: grub2-mkconfig -o /boot/grub2/grub.cfg
 
-- name: reload dconf
-  become: yes
-  command: dconf update
+#- name: reload dconf
+#  become: yes
+#  command: dconf update
 
 - name: restart auditd
   become: yes
@@ -26,3 +26,9 @@
   failed_when: no
   args:
     warn: no
+
+- name: restart sshd
+  become: yes
+  service:
+      name: sshd
+      state: restarted

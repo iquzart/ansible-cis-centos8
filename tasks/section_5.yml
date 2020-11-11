@@ -1,0 +1,747 @@
+- name: "5.1.1 | Ensure cron daemon is enabled (Scored)"
+  systemd:
+    name: crond
+    enabled: yes
+    state: started
+  when:
+    - rule_5_1_1
+  tags:
+    - level1
+    - rule_5.1.1
+    - section_5
+
+- name: "5.1.2 | Ensure permissions on /etc/crontab are configured (Scored)"
+  file:
+    dest: /etc/crontab
+    owner: root
+    group: root
+    mode: 0600
+  when:
+    - rule_5_1_2
+  tags:
+    - level1
+    - rule_5.1.2
+    - section_5
+
+
+- name: "5.1.3 | Ensure permissions on /etc/cron.hourly are configured (Scored)"
+  file:
+    dest: /etc/cron.hourly
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+  when:
+    - rule_5_1_3
+  tags:
+    - level1
+    - rule_5.1.3
+    - section_5
+
+
+- name: "5.1.4 | Ensure permissions on /etc/cron.daily are configured (Scored)"
+  file:
+    dest: /etc/cron.daily
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+  when:
+    - rule_5_1_4
+  tags:
+    - level1
+    - rule_5.1.4
+    - section_5
+
+
+- name: "5.1.5 | Ensure permissions on /etc/cron.weekly are configured (Scored)"
+  file:
+    dest: /etc/cron.weekly
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+  when:
+    - rule_5_1_5
+  tags:
+    - level1
+    - rule_5.1.5
+    - section_5
+
+
+- name: "5.1.6 | Ensure permissions on /etc/cron.monthly are configured (Scored)"
+  file:
+    dest: /etc/cron.monthly
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+  when:
+    - rule_5_1_6
+  tags:
+    - level1
+    - rule_5.1.6
+    - section_5
+
+
+- name: "5.1.7 | Ensure permissions on /etc/cron.d are configured (Scored)"
+  file:
+    dest: /etc/cron.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+  when:
+    - rule_5_1_7
+  tags:
+    - level1
+    - rule_5.1.7
+    - section_5
+
+
+- name: "5.1.8 | Ensure at/cron is restricted to authorized users (Scored)"
+  block:
+    - name: "5.1.8 | Ensure at/cron is restricted to authorized users (Scored)"
+      file:
+        dest: /etc/at.deny
+        state: absent
+
+    - name: "5.1.8 | Check if at.allow exists"
+      stat:
+        path: "/etc/at.allow"
+      register: at_allow
+
+    - name: "5.1.8 | Ensure at/cron is restricted to authorized users (Scored)"
+      file:
+        dest: /etc/at.allow
+        state: '{{ "file" if  at_allow.stat.exists else "touch"}}'
+        owner: root
+        group: root
+        mode: 0600
+
+    - name: "5.1.8 | Ensure at/cron is restricted to authorized users (Scored)"
+      file:
+        dest: /etc/cron.deny
+        state: absent
+
+    - name: "5.1.8 | Check if cron.allow exists (Scored)"
+      stat:
+        path: "/etc/cron.allow"
+      register: cron_allow
+
+    - name: "5.1.8 | Ensure at/cron is restricted to authorized users (Scored)"
+      file:
+        dest: /etc/cron.allow
+        state: '{{ "file" if  cron_allow.stat.exists else "touch"}}'
+        owner: root
+        group: root
+        mode: 0600
+  when:
+    - rule_5_1_8
+  tags:
+    - level1
+    - rule_5.1.8
+    - section_5
+
+- name: "5.2.1 | Ensure permissions on /etc/ssh/sshd_config are configured (Scored)"
+  file:
+    dest: /etc/ssh/sshd_config
+    state: file
+    owner: root
+    group: root
+    mode: 0600
+  when:
+    - rule_5_2_1
+  tags:
+    - level1
+    - rule_5.2.1
+    - section_5
+
+
+- name: "5.2.2 | Ensure SSH Access is limited (Scored)"
+  block:
+    - name: "5.2.2 | Ensure SSH access is limited - allowusers"
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: "^AllowUsers"
+        line: AllowUsers {{ sshd['allowusers'] }}
+      notify:
+        - restart sshd
+      when:
+        - "sshd['allowusers']|default('') != ''"
+
+    - name: "5.2.2 | Ensure SSH access is limited - allowgroups (Scored)"
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: "^AllowGroups"
+        line: AllowGroups {{ sshd['allowgroups'] }}
+      notify:
+        - restart sshd
+      when:
+        - "sshd['allowgroups']|default('') != ''"
+
+    - name: "5.2.2 | Ensure SSH access is limited - denyusers (Scored)"
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: "^DenyUsers"
+        line: DenyUsers {{ sshd['denyusers'] }}
+      notify:
+        - restart sshd
+      when:
+        - "sshd['denyusers']|default('') != ''"
+
+    - name: "5.2.2 | Ensure SSH access is limited - denygroups (Scored)"
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: "^DenyGroups"
+        line: DenyGroups {{ sshd['denygroups'] }}
+      notify:
+        - restart sshd
+      when:
+        - "sshd['denygroups']|default('') != ''"
+  when:
+    - rule_5_2_2
+  tags:
+    - level1
+    - rule_5.2.2
+    - section_5
+
+- name: "5.2.3 | Ensure permissions on SSH private host key files are configured (Scored)"
+  block:
+    - name: "Find Private SSH Hostkeys"
+      command: find /etc/ssh -xdev -type f -name 'ssh_host_*_key'
+      register: privhostkey
+
+    - name: "Set Permissions on Private SSH Hostkeys"
+      file:
+        dest: "{{ item }}"
+        owner: root
+        group: root
+        mode: 0600
+      with_items:
+        - "{{ privhostkey.stdout_lines }}"
+  when:
+    - rule_5_2_3
+  tags:
+    - level1
+    - rule_5.2.3
+    - section_5
+
+- name: "5.2.4 | Ensure permissions on SSH public host key files are configured (Scored)"
+  block:
+    - name: "Find Public SSH Hostkeys"
+      command: find /etc/ssh -xdev -type f -name 'ssh_host_*_key.pub'
+      register: pubhostkey
+
+    - name: "Set Permissions on Public SSH Hostkeys"
+      file:
+        dest: "{{ item }}"
+        owner: root
+        group: root
+        mode: 0644
+      when:
+        - rule_5_2_4
+      with_items:
+      - "{{ pubhostkey.stdout_lines }}"
+  tags:
+    - level1
+    - rule_5.2.4
+    - section_5
+
+- name: "5.2.5 | Ensure SSH LogLevel is appropriate (Scored)"
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: '^LogLevel'
+    line: 'LogLevel INFO'
+  when:
+    - rule_5_2_5
+  tags:
+    - level1
+    - level2
+    - rule_5.2.5
+    - section_5
+
+- name: "5.2.6 | Ensure SSH X11 forwarding is disabled (Scored)"
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: '^X11Forwarding'
+    line: 'X11Forwarding no'
+  when:
+    - rule_5_2_6
+  tags:
+    - level1
+    - level2
+    - rule_5.2.6
+    - section_5
+
+- name: "5.2.7 | Ensure SSH MaxAuthTries is set to 4 or less (Scored)"
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: '^(#)?MaxAuthTries \d'
+    line: 'MaxAuthTries 4'
+  when:
+    - rule_5_2_7
+  tags:
+    - level1
+    - rule_5.2.7
+    - section_5
+
+- name: "5.2.8 | Ensure SSH IgnoreRhosts is enabled (Scored)"
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: '^IgnoreRhosts'
+    line: 'IgnoreRhosts yes'
+  when:
+    - rule_5_2_8
+  tags:
+    - level1
+    - level2
+    - rule_5.2.8
+    - section_5
+
+- name: "5.2.9 | Ensure SSH HostbasedAuthentication is disabled (Scored)"
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: '^HostbasedAuthentication'
+    line: 'HostbasedAuthentication no'
+  when:
+    - rule_5_2_9
+  tags:
+    - level1
+    - rule_5.2.9
+    - section_5
+
+- name: "5.2.10 | Ensure SSH root login is disabled (Scored)"
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: '^PermitRootLogin'
+    line: 'PermitRootLogin no'
+  when:
+    - rule_5_2_10
+  tags:
+    - level1
+    - rule_5.2.10
+    - section_5
+
+- name: "5.2.11 | Ensure SSH PermitEmptyPasswords is disabled (Scored)"
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: '^PermitEmptyPasswords'
+    line: 'PermitEmptyPasswords no'
+  when:
+    - rule_5_2_11
+  tags:
+    - level1
+    - rule_5.2.11
+    - section_5
+
+- name: "5.2.12 | Ensure SSH PermitUserEnvironment is disabled (Scored)"
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: '^PermitUserEnvironment'
+    line: 'PermitUserEnvironment no'
+  when:
+    - rule_5_2_12
+  tags:
+    - level1
+    - rule_5.2.12
+    - section_5
+
+- name: "5.2.13 | Ensure SSH Idle Timeout Interval is configured (Scored)"
+  block:
+    - name: "5.2.13 | Ensure SSH Idle Timeout Interval is configured (Scored)"
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: '^ClientAliveInterval'
+        line: "ClientAliveInterval {{ sshd['clientaliveinterval'] }}"
+
+    - name: "5.2.13 | Ensure SSH ClientAliveCountMax set to <= 3"
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: '^ClientAliveCountMax'
+        line: "ClientAliveCountMax {{ sshd['clientalivecountmax'] }}"
+  when:
+    - rule_5_2_13
+  tags:
+    - level1
+    - rule_5.2.13
+    - section_5
+
+- name: "5.2.14 | Ensure SSH LoginGraceTime is set to one minute or less (Scored)"
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: '^LoginGraceTime'
+    line: "LoginGraceTime {{ sshd['logingracetime'] }}"
+  when:
+    - rule_5_2_14
+  tags:
+    - level1
+    - rule_5.2.14
+    - section_5
+
+- name: "5.2.15 | Ensure SSH warning banner is configured (Scored)"
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: '^Banner'
+    line: 'Banner /etc/issue.net'
+  when:
+    - rule_5_2_15
+  tags:
+    - level1
+    - rule_5.2.15
+    - section_5
+
+- name: "5.2.16 | Ensure SSH PAM is enabled (Scored)"
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: '^UsePAM yes'
+    line: 'UsePAM yes'
+  when:
+    - rule_5_2_16
+  tags:
+    - level1
+    - rule_5.2.16
+    - section_5
+
+- name: "5.2.17 | Ensure SSH AllowTcpForwarding is disabled (Scored)"
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: '^AllowTcpForwarding'
+    line: 'AllowTcpForwarding no'
+  when:
+    - rule_5_2_17
+  tags:
+    - level2
+    - rule_5.2.17
+    - section_5
+
+- name: "5.2.18 | Ensure SSH MaxStartups is configured (Scored)"
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: '^maxstartups'
+    line: 'maxstartups 10:30:60'
+  when:
+    - rule_5_2_18
+  tags:
+    - level2
+    - rule_5.2.18
+    - section_5
+
+- name: "5.2.19 | Ensure SSH MaxSessions is set to 4 or less (Scored)"
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: '^maxsessions'
+    line: 'maxsessions 4'
+  when:
+    - rule_5_2_19
+  tags:
+    - level2
+    - rule_5.2.19
+    - section_5
+
+- name: "5.2.20 | Ensure system-wide crypto policy is not over-ridden (Scored)"
+  lineinfile:
+    dest: /etc/sysconfig/sshd
+    regexp: "^\\s*CRYPTO_POLICY\\s*=\\s*.*$"
+    state: absent
+  when:
+    - rule_5_2_20
+  tags:
+    - level1
+    - rule_5.2.20
+    - section_5
+
+- name: "5.3.1 | Create custom authselect profile (Scored)"
+  block:
+    - name: 5.3.1 Create custom authselect profile (Scored) - search profile
+      shell: authselect list | grep custom/{{ authselect_profile }}
+      register: authselect_list_profiles
+      changed_when: false
+      failed_when: false
+
+    - name: 5.3.1 Create custom authselect profile (Scored) - create profile
+      command: authselect create-profile {{ authselect_profile }} -b sssd --symlink-meta
+      when:
+        - authselect_list_profiles.rc != 0
+  when:
+    - rule_5_3_1
+  tags:
+    - level1
+    - rule_5.3.1
+    - section_5
+
+- name: "5.3.2 | Select authselect profile (Scored)"
+  block:
+    - name: 5.3.2 Select authselect profile (Scored) - find current profile
+      shell: "authselect current | grep \"Profile ID\" | sed 's@Profile ID: @@'"
+      register: authselect_current_profile
+      changed_when: false
+      failed_when: false
+
+    - name: "5.3.2 Select authselect profile (Scored) - select profile\n
+             5.3.3 Ensure authselect includes with-faillock (Scored)"
+      command: authselect select custom/{{ authselect_profile }} {{ 5_3_3 | ternary("with-faillock", "") }} --force
+      when:
+        - authselect_current_profile.rc == 0
+        - authselect_current_profile.stdout != "/".join(["custom", authselect_profile])
+  when:
+    - rule_5_3_2
+    - rule_5_3_3
+  tags:
+    - level1
+    - rule_5.3.2
+    - rule_5.3.3
+    - section_5
+
+
+- name: "5.4.1 | Ensure password creation requirements are configured (Scored)"
+  lineinfile:
+    state: present
+    dest: /etc/security/pwquality.conf
+    regexp: '^{{ item.key }}'
+    line: '{{ item.key }} = {{ item.value }}'
+  with_items:
+    - { key: 'minlen',  value: '14' }
+    - { key: 'dcredit', value: '-1' }
+    - { key: 'ucredit', value: '-1' }
+    - { key: 'ocredit', value: '-1' }
+    - { key: 'lcredit', value: '-1' }
+  when:
+    - rule_5_4_1
+  tags:
+    - level1
+    - rule_5.4.1
+    - section_5
+
+- name: "5.4.2 | Ensure lockout for failed password attempts is configured (Scored)"
+  block:
+    - name: "5.4.2 | Ensure lockout for failed password attempts is configured (Scored) | Unlock Time"
+      replace:
+        path: /etc/authselect/custom/{{ authselect_profile }}/{{ item }}
+        regexp: '^(\s*auth\s+required\s+pam_faillock.so\s+.*unlock_time=)\S+(\s*.*)$'
+        replace: '\g<1>{{ pam_failllock_timeout }}\g<2>'
+      with_items:
+        - password-auth
+        - system-auth
+    - name: 5.4.2 Ensure lockout for failed password attempts is configured (Scored) - deny
+      replace:
+        path: /etc/authselect/custom/{{ authselect_profile }}/password-auth
+        regexp: '^(\s*auth\s+required\s+pam_faillock.so\s+.*deny=)\S+(\s*.*)$'
+        replace: '\g<1>{{ pam_failllock_deny }}\g<2>'
+  when:
+    - rule_5_3_2
+    - rule_5_3_3
+    - rule_5_4_2
+  tags:
+    - level1
+    - rule_5.4
+    - rule_5.4.2
+    - section_5
+
+- name: "5.4.3 | Ensure password reuse is limited (Scored)"
+  command: /bin/true
+  changed_when: false
+  tags:
+    - level1
+    - rule_5.4
+    - rule_5.4.3
+    - section_5
+
+- name: "5.4.4 | Ensure password hashing algorithm is SHA-512 (Scored)"
+  command: /bin/true
+  changed_when: false
+  when:
+    - rule_5_4_4
+  tags:
+    - level1
+    - rule_5.4.4
+    - section_5
+
+- name: "5.5.1.1 | Ensure password expiration is 365 days or less (Scored)"
+  lineinfile:
+    dest: /etc/login.defs
+    regexp: "^\\s*PASS_MAX_DAYS\\s*.*$"
+    line: 'PASS_MAX_DAYS {{ pass_max_days }}'
+    state: present
+  when:
+    - rule_5_5_1_1
+  tags:
+    - level1
+    - rule_5.5.1.1
+    - section_5
+
+- name: "5.5.1.2 | Ensure minimum days between password changes is 7 or more (Scored)"
+  lineinfile:
+    dest: /etc/login.defs
+    regexp: "^\\s*PASS_MIN_DAYS\\s*.*$"
+    line: 'PASS_MIN_DAYS {{ pass_min_days }}'
+    state: present
+  tags:
+    - level1
+    - rule_5.5.1
+    - rule_5.5.1.2
+    - section_5
+
+- name: "5.5.1.3 | Ensure password expiration warning days is 7 or more (Scored)"
+  lineinfile:
+    dest: /etc/login.defs
+    regexp: "^\\s*PASS_WARN_AGE\\s*.*$"
+    line: 'PASS_WARN_AGE {{ pass_warn_age }}'
+    state: present
+  when:
+    - rule_5_5_1_3
+  tags:
+    - level1
+    - rule_5.5.1.3
+    - section_5
+
+- name: "5.5.1.4 | Ensure inactive password lock is 30 days or less (Scored)"
+  lineinfile:
+    dest: /etc/default/useradd
+    regexp: "^\\s*INACTIVE\\s*=\\s*.*$"
+    line: 'INACTIVE={{ useradd_inactive }}'
+    state: present
+  when:
+    - rule_5_5_1_4
+  tags:
+    - level1
+    - rule_5.5.1
+    - rule_5.5.1.4
+    - section_5
+
+- name: "5.5.1.5 | Ensure all users last password change date is in the past (Scored)"
+  command: /bin/true
+  changed_when: no
+  when:
+    - rule_5_5_1_5
+  tags:
+    - level1
+    - rule_5_5_1_5
+    - section_5
+    - notimplemented
+
+- name: "5.5.2 | Ensure system accounts are secured (Scored)"
+  block:
+    - name: 5.5.2 Ensure system accounts are secured (Scored) - find users
+      shell: "awk -F: '($3 < {{ min_uid }}) {print $1 }' /etc/passwd"
+      changed_when: false
+      check_mode: false
+      register: system_account
+
+    - name: 5.5.2 Ensure system accounts are secured (Scored) - lock users
+      user:
+        name: "{{ item }}"
+        password_lock: true
+      with_items:
+        - "{{ system_account.stdout_lines }}"
+      when:
+        - item != "root"
+
+    - name: 5.5.2 Ensure system accounts are secured (Scored) - set shell to nologin
+      user:
+        name: "{{ item }}"
+        shell: /sbin/nologin
+      with_items:
+        - "{{ system_account.stdout_lines }}"
+      when:
+        - item != "root"
+        - item != "sync"
+        - item != "shutdown"
+        - item != "halt"
+  when:
+    - rule_5_5_2
+  tags:
+    - level1
+    - rule_5.5.2
+    - section_5
+    - notimplemented
+
+- name: "5.5.3 | Ensure default user shell timeout is 900 seconds or less (Scored)"
+  lineinfile:
+    state: present
+    dest: "{{ item }}"
+    create: true
+    regexp: '^TMOUT='
+    line: "TMOUT={{ shell_timeout }} ; export TMOUT"
+  with_items:
+    - /etc/bashrc
+    - /etc/profile
+  when:
+    - rule_5_5_4
+  tags:
+    - level1
+    - rule_5.5.4
+    - section_5
+
+- name: "5.5.4 | Ensure default group for the root account is GID 0 (Scored)"
+  user:
+    name: root
+    group: "0"
+  when:
+    - rule_5_5_4
+  tags:
+    - level1
+    - rule_5.5.4
+    - section_5
+    - notimplemented
+
+- name: "5.5.5 | Ensure default user umask is 027 or more restrictive (Scored)"
+  replace:
+    dest: "{{ item }}"
+    regexp: '^(\s*umask\s+)\d+$'
+    replace: '\g<1>{{ umask }}'
+  with_items:
+    - /etc/bashrc
+    - /etc/profile
+  when:
+    - rule_5_5_5
+  tags:
+    - level1
+    - rule_5.5.5
+    - section_5
+
+- name: "5.6 | Ensure root login is restricted to system console (Not Scored)"
+  command: /bin/true
+  changed_when: no
+  tags:
+    - level1
+    - rule_5.6
+    - section_5
+
+- name: "5.7 | Ensure access to the su command is restricted (Scored)"
+  block:
+    - name: 5.7 Ensure access to the su command is restricted (Scored) | Config PAM
+      lineinfile:
+        state: present
+        dest: /etc/pam.d/su
+        regexp: '^(#)?auth\s+required\s+pam_wheel\.so'
+        line: 'auth required pam_wheel.so use_uid'
+
+    - name: 5.7 Ensure access to the su command is restricted (Scored) | Add root to Wheel Group
+      user:
+        name: root
+        groups: wheel
+  tags:
+    - level1
+    - rule_5.7
+    - section_5

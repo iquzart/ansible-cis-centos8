@@ -462,8 +462,18 @@
     - section_3
 
 - name: "3.5 | Ensure wireless interfaces are disabled (Scored)"
-  command: /bin/true
-  changed_when: no
+  block:
+    - name: 3.5 Ensure wireless interfaces are disabled (Scored) | Get status
+      shell: |
+        set -o pipefail
+        nmcli radio all | awk '$1 !~ /WIFI/{ print $2}'
+      register: wireless_status
+      changed_when: false
+
+    - name: 3.5 Ensure wireless interfaces are disabled (Scored)
+      command: nmcli radio all off
+      when:
+        - wireless_status.stdout == 'enabled'
   when:
     - rule_3_5
   tags:

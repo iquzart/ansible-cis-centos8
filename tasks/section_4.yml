@@ -42,13 +42,26 @@
     - section_4
 
 - name: "4.1.1.4 | Ensure audit_backlog_limit is sufficient (Scored)"
-  replace:
-    dest: /etc/default/grub
-    regexp: '(^GRUB_CMDLINE_LINUX\s*\=\s*)(?:")(.+)(?<!audit_backlog_limit=8192)(?:")'
-    replace: '\1"\2 audit_backlog_limit=8192"'
-    follow: yes
-  ignore_errors: yes
-  notify: generate new grub config
+  block: 
+  - name: "4.1.1.4 | Ensure audit_backlog_limit is sufficient (Scored) | Check config"
+    command: grep -E "GRUB_CMDLINE_LINUX=.*audit_backlog_limit={{ audit_backlog_limit }}.*" /etc/default/grub
+    register: grep_audit_backlog_grub
+    failed_when: false
+    changed_when: false
+
+  - name: "4.1.1.4 | Ensure audit_backlog_limit is sufficient (Scored) | Update config"
+    lineinfile:
+      dest: /etc/default/grub
+      regexp: '^GRUB_CMDLINE_LINUX="(.*)"$'
+      line: 'GRUB_CMDLINE_LINUX="\1 audit_backlog_limit={{ audit_backlog_limit }}"'
+      state: present
+      owner: root
+      group: root
+      mode: 0644
+      backrefs: true
+    notify: generate new grub config
+    when:
+      - grep_audit_backlog_grub.rc == 1
   when:
     - rule_4_1_1_3
   tags:
@@ -162,7 +175,7 @@
 
 - name: "4.1.6 | Ensure events that modify date and time information are collected (Scored)"
   template:
-    src: audit/rule_4_1_4.rules.j2
+    src: audit/rule_4_1_6.rules.j2
     dest: /etc/audit/rules.d/rule_4_1_6.rules
     owner: root
     group: root
