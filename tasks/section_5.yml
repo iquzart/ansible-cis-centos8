@@ -623,11 +623,21 @@
     - section_5
 
 - name: "5.5.1.3 | Ensure password expiration warning days is 7 or more (Scored)"
-  lineinfile:
-    dest: /etc/login.defs
-    regexp: "^\\s*PASS_WARN_AGE\\s*.*$"
-    line: "PASS_WARN_AGE {{ password_policy['warn_age'] }}"
-    state: present
+  block:
+    - name: "5.5.1.3 | Ensure password expiration warning days is 7 or more (Scored)"
+      lineinfile:
+        dest: /etc/login.defs
+        regexp: "^\\s*PASS_WARN_AGE\\s*.*$"
+        line: "PASS_WARN_AGE {{ password_policy['warn_age'] }}"
+        state: present
+
+    - name: "5.5.1.3 | Ensure password expiration warning days is 7 or more (Scored)"
+      command: "awk -F: '{if($6 != {{ password_policy['warn_age'] }}) print $1}' /etc/shadow"
+      register: users_warn_output
+
+    - name: "5.5.1.3 | Ensure password expiration warning days is 7 or more (Scored)"
+      command: "chage --warndays {{ password_policy['warn_age'] }} {{ item }}"
+      with_items: "{{ users_warn_output.stdout_lines  }}"
   when:
     - rule_5_5_1_3
   tags:
