@@ -847,15 +847,16 @@
 
 - name: "1.10 | Ensure system-wide crypto policy is not legacy (Scored)"
   block:
-    - name: 1.10 | Ensure system-wide crypto policy is not legacy (Scored) | Check Current Crypto Policy
-      slurp:
-        src: /etc/crypto-policies/config
-      register: crypto_policy
+    - name: "1.10 | Ensure system-wide crypto policy is not legacy (Scored) | Check Current Crypto Policy"
+      command: grep -E '^\s*(DEFAULT|FUTURE|FIPS)\s*$' /etc/crypto-policies/config
+      register: c_policy
+      changed_when: false
+      failed_when: false
 
-    - name: 1.10 | Ensure system-wide crypto policy is not legacy (Scored) | Update if not to DEFAULT
-      command: update-crypto-policies --set DEFAULT
+    - name: "1.10 | Ensure system-wide crypto policy is not legacy (Scored)"
+      command: update-crypto-policies --set {{ crypto_policy }}
       when:
-        - '"LEGACY" in crypto_policy.content|b64decode'
+        - c_policy.stdout == 'LEGACY'
   when:
     - rule_1_10
     - rule_1_11
@@ -864,15 +865,14 @@
     - level2
     - section_1
     - rule_1.10
+    - rule_1.11
     - crypto
 
 - name: "1.11 | Ensure system-wide crypto policy is FUTURE or FIPS (Scored)"
-  shell: |
-    update-crypto-policies --set {{ crypto_policy }}
-    update-crypto-policies
+  command: update-crypto-policies --set {{ crypto_policy }}
   when:
     - rule_1_11
-    - crypto_policy.stdout == 'DEFAULT' or crypto_policy.stdout == 'LEGACY'
+    - c_policy.stdout == 'DEFAULT' or c_policy.stdout == 'LEGACY'
   tags:
     - level1
     - level2
