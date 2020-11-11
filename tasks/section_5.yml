@@ -160,7 +160,7 @@
 
 - name: "5.2.2 | Ensure SSH Access is limited (Scored)"
   block:
-    - name: "5.2.2 | Ensure SSH access is limited - allowusers"
+    - name: "5.2.2 | Ensure SSH access is limited (Scored) | AllowUsers"
       lineinfile:
         state: present
         dest: /etc/ssh/sshd_config
@@ -171,7 +171,7 @@
       when:
         - "sshd['allowusers']|default('') != ''"
 
-    - name: "5.2.2 | Ensure SSH access is limited - allowgroups (Scored)"
+    - name: "5.2.2 | Ensure SSH access is limited (Scored) | AllowGroups"
       lineinfile:
         state: present
         dest: /etc/ssh/sshd_config
@@ -182,7 +182,7 @@
       when:
         - "sshd['allowgroups']|default('') != ''"
 
-    - name: "5.2.2 | Ensure SSH access is limited - denyusers (Scored)"
+    - name: "5.2.2 | Ensure SSH access is limited (Scored) | DenyUsers"
       lineinfile:
         state: present
         dest: /etc/ssh/sshd_config
@@ -193,7 +193,7 @@
       when:
         - "sshd['denyusers']|default('') != ''"
 
-    - name: "5.2.2 | Ensure SSH access is limited - denygroups (Scored)"
+    - name: "5.2.2 | Ensure SSH access is limited (Scored) | DenyGroups"
       lineinfile:
         state: present
         dest: /etc/ssh/sshd_config
@@ -473,13 +473,13 @@
 
 - name: "5.3.1 | Create custom authselect profile (Scored)"
   block:
-    - name: 5.3.1 Create custom authselect profile (Scored) - search profile
+    - name: 5.3.1 Create custom authselect profile (Scored) | Check for profile
       shell: authselect list | grep custom/{{ authselect_profile }}
       register: authselect_list_profiles
       changed_when: false
       failed_when: false
 
-    - name: 5.3.1 Create custom authselect profile (Scored) - create profile
+    - name: 5.3.1 Create custom authselect profile (Scored) | Create profile
       command: authselect create-profile {{ authselect_profile }} -b sssd --symlink-meta
       when:
         - authselect_list_profiles.rc != 0
@@ -492,7 +492,7 @@
 
 - name: "5.3.2 | Select authselect profile (Scored)"
   block:
-    - name: 5.3.2 Select authselect profile (Scored) - find current profile
+    - name: 5.3.2 Select authselect profile (Scored) | Get current profile
       shell: "authselect current | grep \"Profile ID\" | sed 's@Profile ID: @@'"
       register: authselect_current_profile
       changed_when: false
@@ -543,7 +543,8 @@
       with_items:
         - password-auth
         - system-auth
-    - name: 5.4.2 Ensure lockout for failed password attempts is configured (Scored) - deny
+
+    - name: 5.4.2 Ensure lockout for failed password attempts is configured (Scored) | Faillock Deny
       replace:
         path: /etc/authselect/custom/{{ authselect_profile }}/password-auth
         regexp: '^(\s*auth\s+required\s+pam_faillock.so\s+.*deny=)\S+(\s*.*)$'
@@ -672,13 +673,13 @@
 
 - name: "5.5.2 | Ensure system accounts are secured (Scored)"
   block:
-    - name: 5.5.2 Ensure system accounts are secured (Scored) - find users
+    - name: 5.5.2 Ensure system accounts are secured (Scored) | Get users
       shell: "awk -F: '($3 < {{ min_uid }}) {print $1 }' /etc/passwd"
       changed_when: false
       check_mode: false
       register: system_account
 
-    - name: 5.5.2 Ensure system accounts are secured (Scored) - lock users
+    - name: 5.5.2 Ensure system accounts are secured (Scored) | Lock users
       user:
         name: "{{ item }}"
         password_lock: true
@@ -687,7 +688,7 @@
       when:
         - item != "root"
 
-    - name: 5.5.2 Ensure system accounts are secured (Scored) - set shell to nologin
+    - name: 5.5.2 Ensure system accounts are secured (Scored) | Set shell to nologin
       user:
         name: "{{ item }}"
         shell: /sbin/nologin

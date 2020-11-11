@@ -97,7 +97,7 @@
     - udf
 
 
-- name: "1.1.2 | Ensure separate partition exists for /tmp | enable and start/restart tmp.mount  (Scored)"
+- name: "1.1.2 | Ensure separate partition exists for /tmp | Enable and start/restart tmp.mount  (Scored)"
   systemd:
     name: tmp.mount
     daemon_reload: yes
@@ -569,13 +569,13 @@
 
 - name: "1.5.3 | Ensure authentication required for single user mode (Scored)"
   block:
-    - name: "1.5.3 | Ensure authentication required for single user mode (Scored) - emergency"
+    - name: "1.5.3 | Ensure authentication required for single user mode (Scored) | Emergency"
       lineinfile:
         dest: /usr/lib/systemd/system/emergency.service
         regexp: '/sbin/sulogin'
         line: 'execstart=-/usr/lib/systemd/systemd-sulogin-shell rescue'
 
-    - name: "1.5.3 | Ensure authentication required for single user mode (Scored) - rescue"
+    - name: "1.5.3 | Ensure authentication required for single user mode (Scored) | Rescue"
       lineinfile:
         dest: /usr/lib/systemd/system/rescue.service
         regexp: '/sbin/sulogin'

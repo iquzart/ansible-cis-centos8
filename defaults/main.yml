@@ -11,7 +11,7 @@ section_6: true
 
 # Section 1 rules
 rule_1_1_1_1: true         # Ensure mounting of cramfs filesystems is disabled
-rule_1_1_1_2: true         # Ensure mounting of vFAT filesystems is disabled
+rule_1_1_1_2: false         # Ensure mounting of vFAT filesystems is disabled
 rule_1_1_1_3: true         # Ensure mounting of squashfs filesystems is disabled
 rule_1_1_1_4: true         # Ensure mounting of udf filesystems is disabled
 rule_1_1_2: true           # Ensure separate partition exists for /tmp | enable and start/restart tmp.mount
@@ -203,7 +203,7 @@ rule_5_4_4: true           # Ensure password hashing algorithm is SHA-512
 rule_5_5_1_1: true         # Ensure password expiration is 365 days or less
 rule_5_5_1_2: true         # Ensure minimum days between password changes is 0 or more
 rule_5_5_1_3: true         # Ensure password expiration warning days is 14 or more
-rule_5_5_1_4: true         # Ensure inactive password lock is 90 days or less
+rule_5_5_1_4: false         # Ensure inactive password lock is 90 days or less
 rule_5_5_1_5: true         # Ensure all users last password change date is in the past
 rule_5_5_2: true           # Ensure system accounts are secured
 rule_5_5_3: true           # Ensure default user shell timeout is 900 seconds or less
