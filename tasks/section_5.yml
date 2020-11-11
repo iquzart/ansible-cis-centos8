@@ -578,11 +578,21 @@
     - section_5
 
 - name: "5.5.1.1 | Ensure password expiration is 365 days or less (Scored)"
-  lineinfile:
-    dest: /etc/login.defs
-    regexp: "^\\s*PASS_MAX_DAYS\\s*.*$"
-    line: "PASS_MAX_DAYS {{ password_policy['max_days'] }}"
-    state: present
+  block:
+    - name: "5.5.1.1 | Ensure password expiration is 365 days or less (Scored)"
+      lineinfile:
+        dest: /etc/login.defs
+        regexp: "^\\s*PASS_MAX_DAYS\\s*.*$"
+        line: "PASS_MAX_DAYS {{ password_policy['max_days'] }}"
+        state: present
+    
+    - name: "SCORED | 5.5.1.1 | Ensure password expiration is 365 days or less (Scored)"
+      command: "awk -F: '{if($5 != {{ password_policy['max_days'] }}) print $1}' /etc/shadow"
+      register: users_exp_output
+
+    - name: "SCORED | 5.5.1.1 | Ensure password expiration is 365 days or less (Scored)"
+      command: "chage --maxdays {{ password_policy['max_days'] }} {{ item }}"
+      with_items: "{{ users_exp_output.stdout_lines }}"
   when:
     - rule_5_5_1_1
   tags:
