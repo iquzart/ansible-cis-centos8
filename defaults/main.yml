@@ -133,6 +133,7 @@ rule_3_6: true             # Ensure IPv6 is disabled
 rule_4_1_1_1: true         # Ensure auditd is installed
 rule_4_1_1_2: true         # Ensure auditd service is enabled
 rule_4_1_1_3: true         # Ensure auditing for processes that start prior to auditd is enabled
+rule_4_1_1_4: true         # Ensure audit_backlog_limit is sufficient
 rule_4_1_2_1: true         # Ensure audit log storage size is configured
 rule_4_1_2_2: true         # Ensure audit logs are not automatically deleted
 rule_4_1_2_3: true         # Ensure system is disabled when audit logs are full
