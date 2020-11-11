@@ -586,11 +586,11 @@
         line: "PASS_MAX_DAYS {{ password_policy['max_days'] }}"
         state: present
     
-    - name: "SCORED | 5.5.1.1 | Ensure password expiration is 365 days or less (Scored)"
+    - name: "5.5.1.1 | Ensure password expiration is 365 days or less (Scored)"
       command: "awk -F: '{if($5 != {{ password_policy['max_days'] }}) print $1}' /etc/shadow"
       register: users_exp_output
 
-    - name: "SCORED | 5.5.1.1 | Ensure password expiration is 365 days or less (Scored)"
+    - name: "5.5.1.1 | Ensure password expiration is 365 days or less (Scored)"
       command: "chage --maxdays {{ password_policy['max_days'] }} {{ item }}"
       with_items: "{{ users_exp_output.stdout_lines }}"
   when:
@@ -601,11 +601,21 @@
     - section_5
 
 - name: "5.5.1.2 | Ensure minimum days between password changes is 7 or more (Scored)"
-  lineinfile:
-    dest: /etc/login.defs
-    regexp: "^\\s*PASS_MIN_DAYS\\s*.*$"
-    line: "PASS_MIN_DAYS {{ password_policy['min_days'] }}"
-    state: present
+  block:
+    - name: "5.5.1.2 | Ensure minimum days between password changes is 7 or more (Scored)"
+      lineinfile:
+        dest: /etc/login.defs
+        regexp: "^\\s*PASS_MIN_DAYS\\s*.*$"
+        line: "PASS_MIN_DAYS {{ password_policy['min_days'] }}"
+        state: present
+
+    - name: "5.5.1.2 | Ensure minimum days between password changes is 7 or more (Scored)"
+      command: "awk -F: '{if($4 != {{ password_policy['min_days'] }}) print $1}' /etc/shadow"
+      register: users_min_output
+
+    - name: "5.5.1.2 | Ensure minimum days between password changes is 7 or more (Scored)"
+      command: "chage --mindays {{ password_policy['min_days'] }} {{ item }}"
+      with_items: "{{ users_min_output.stdout_lines }}"
   tags:
     - level1
     - rule_5.5.1
