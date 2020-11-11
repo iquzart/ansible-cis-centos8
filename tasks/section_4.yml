@@ -494,9 +494,33 @@
     - section_4
 
 - name: "4.2.3 | Ensure permissions on all logfiles are configured (Scored)"
-  command: find /var/log -type f -exec chmod g-wx,o-rwx {} +
-  changed_when: no
-  failed_when: no
+  block:
+  - name: "4.2.3 |  Ensure permissions on all logfiles are configured (Scored) | Get files"
+    command: find /var/log -type f -perm /037
+    register: logfile_wrong_permissions
+    failed_when: false
+    changed_when: false
+
+  - name: "4.2.3 | Ensure permissions on all logfiles are configured (Scored) | Get directories"
+    command: find /var/log -type d -perm /026
+    register: logdir_wrong_permissions
+    failed_when: false
+    changed_when: false
+
+  - name: "4.2.3 | Ensure permissions on all logfiles are configured (Scored) | Set files permissions"
+    file:
+      dest: "{{ item }}"
+      mode: 0640
+    with_items: "{{ logfile_wrong_permissions.stdout_lines }}"
+    when: logfile_wrong_permissions.stdout_lines | length > 0
+
+  - name: "4.2.3 | Ensure permissions on all logfiles are configured (Scored) | Set directories permissions"
+    file:
+      dest: "{{ item }}"
+      state: directory
+      mode: 0750
+    with_items: "{{ logdir_wrong_permissions.stdout_lines }}"
+    when: logdir_wrong_permissions.stdout_lines | length > 0
   when:
     - rule_4_2_3
   tags:
