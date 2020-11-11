@@ -483,13 +483,26 @@
     - notimplemented
 
 - name: "3.6 | Disable IPv6 (Not Scored)"
-  replace:
-    dest: /etc/default/grub
-    regexp: '(^GRUB_CMDLINE_LINUX\s*\=\s*)(?:")(.+)(?<!ipv6.disable=1)(?:")'
-    replace: '\1"\2 ipv6.disable=1"'
-    follow: yes
-  ignore_errors: yes
-  notify: generate new grub config
+  block: 
+    - name: "3.6 | Disable IPv6 (Not Scored) | Check config"
+      command: grep -E "GRUB_CMDLINE_LINUX=.*ipv6.disable=1.*" /etc/default/grub
+      register: grep_ipv6_grub
+      failed_when: false
+      changed_when: false
+
+    - name: "3.6 | Disable IPv6 (Not Scored) | Update config"
+      lineinfile:
+        dest: /etc/default/grub
+        regexp: '^GRUB_CMDLINE_LINUX="(.*)"$'
+        line: 'GRUB_CMDLINE_LINUX="\1 ipv6.disable=1"'
+        state: present
+        owner: root
+        group: root
+        mode: 0644
+        backrefs: true
+      notify: generate new grub config
+      when:
+        - grep_ipv6_grub.rc == 1
   when:
     - rule_3_6
   tags:
