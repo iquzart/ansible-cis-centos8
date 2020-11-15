@@ -31,17 +31,7 @@
     create: yes
   when:
     - rule_1_1_1_2
-  tags:
-    - section_1
-    - not_scored
-    - vfat
-
-- name: "1.1.1.2 | Remove FAT module"
-  modprobe:
-    name: vfat
-    state: absent
-  when:
-    - rule_1_1_1_2
+    - not booted_with_efi
   tags:
     - section_1
     - not_scored
@@ -324,8 +314,8 @@
     name: autofs
     enabled: no
   when:
-    - "'autofs.service' in ansible_facts.services"
     - rule_1_1_22
+    - "'autofs.service' in ansible_facts.services"
   tags:
     - level1
     - patch
@@ -517,11 +507,16 @@
     - rule_1.4.2
 
 - name: "1.5.1 | Ensure permissions on bootloader config are configured (Scored)"
-  stat:
-    path: /etc/grub2.cfg
-  register: grub_cfg
+  file:
+    path: "{{ item }}"
+    owner: root
+    group: root
+    mode: 0600
   when:
-    - rule_1_5_1 | bool
+    - rule_1_5_1
+  with_items:
+    - /boot/grub2/grubenv
+    - "{{ grub_config_file }}"
   tags:
     - level1
     - scored
@@ -529,21 +524,6 @@
     - patch
     - rule_1.5.1
 
-- name: "1.5.1 | Ensure permissions on bootloader config are configured (Scored)"
-  file:
-    path: "{{ grub_cfg.stat.lnk_source }}"
-    owner: root
-    group: root
-    mode: 0600
-  when:
-    - grub_cfg.stat.exists and grub_cfg.stat.islnk
-    - rule_1_5_1
-  tags:
-    - level1
-    - scored
-    - grub
-    - patch
-    - rule_1.5.1
 
 - name: "1.5.2 | Ensure bootloader password is set (Scored)" 
   block:
@@ -655,30 +635,14 @@
     - patch
     - rule_1.7.1.2
 
-###############################################
-#- name: "1.7.1.3 | Ensure SELinux policy is configured (Scored)"
-#  selinux:
-#    conf: /etc/selinux/config
-#    policy: "{{ selinux_policy }}"
-#    state: "{{ selinux_state }}"
-#  debug:
-#    msg: "--> Not relevant"
-#  changed_when: no
-#  when:
-#    - rule_1_7_1_3
-#  tags:
-#    - level2
-#    - scored
-#    - selinux
-#    - patch
-#    - rule_1.7.1.3
-################################################
-- name: "1.7.1.4 | Ensure the SELinux state is enforcing (Scored)"
+- name: "1.7.1.3 | Ensure the SELinux policy is configured (Scored)\n
+         1.7.1.4 | Ensure the SELinux state is enforcing (Scored)"
   selinux:
     conf: /etc/selinux/config
     policy: "{{ selinux_policy }}"
     state: "{{ selinux_state }}"
   when:
+    - rule_1_7_1_3
     - rule_1_7_1_4
   tags:
     - level2

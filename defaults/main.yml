@@ -11,7 +11,7 @@ section_6: true
 
 # Section 1 rules
 rule_1_1_1_1: true         # Ensure mounting of cramfs filesystems is disabled
-rule_1_1_1_2: false         # Ensure mounting of vFAT filesystems is disabled
+rule_1_1_1_2: true         # Ensure mounting of vFAT filesystems is disabled
 rule_1_1_1_3: true         # Ensure mounting of squashfs filesystems is disabled
 rule_1_1_1_4: true         # Ensure mounting of udf filesystems is disabled
 rule_1_1_2: true           # Ensure separate partition exists for /tmp | enable and start/restart tmp.mount
@@ -34,8 +34,8 @@ rule_1_1_18: true          # Ensure nodev option set on removable media partitio
 rule_1_1_19: true          # Ensure nosuid option set on removable media partitions
 rule_1_1_20: true          # Ensure noexec option set on removable media partitions
 rule_1_1_21: true          # Ensure sticky bit is set on all world-writable directories
-rule_1_1_22: true          # Diable automounting
-rule_1_1_23: true         # Disable USB Storage
+rule_1_1_22: true          # Disable automounting
+rule_1_1_23: true          # Disable USB Storage
 rule_1_2_1: true           # Ensure Red Hat Subscription Manager connection is configured
 rule_1_2_2: true           # Disable the RHNSD daemon
 rule_1_2_3: true           # Ensure gpg keys are configured
@@ -65,7 +65,7 @@ rule_1_8_1_4: true         # Ensure permissions on /etc/motd are configured
 rule_1_8_1_5: true         # Ensure permissions on /etc/issue are configured
 rule_1_8_1_6: true         # Ensure permissions on /etc/issue.net are configured
 rule_1_8_2: true           # Ensure GDM login banner is configured
-rule_1_9: true            # Ensure updates, patches, and additional security software are installed
+rule_1_9: false            # Ensure updates, patches, and additional security software are installed
 rule_1_10: true            # Ensure system-wide crypto policy is not legacy
 rule_1_11: true            # Ensure system-wide crypto policy is is FUTURE or FIPS
 
@@ -333,8 +333,8 @@ sshd:
     ciphers: "aes256-ctr,aes192-ctr,aes128-ctr"
     macs: "hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com"
     logingracetime: 60
-    #allowusers: 
-    allowgroups: wheel
+    allowusers: iqbal
+    #allowgroups: wheel
     #denyusers:
     #denygroups:
 

@@ -12,7 +12,7 @@
 
 - name: generate new grub config
   become: yes
-  command: grub2-mkconfig -o /boot/grub2/grub.cfg
+  command: grub2-mkconfig -o {{ grub_config_file }}
 
 #- name: reload dconf
 #  become: yes
