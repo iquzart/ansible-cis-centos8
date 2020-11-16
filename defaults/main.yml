@@ -289,10 +289,6 @@ warning_banner_motd: |
     Authorized uses only. All activity may be monitored and reported.
 # End Banner
 
-# Warning Banner Content (GDM)
-warning_banner: |
-    Authorized uses only. All activity may be monitored and reported.
-
 # Warning Banner Content (issue, issue.net)
 warning_banner_issue: |
   WARNING:   This system is for use of authorized users only.

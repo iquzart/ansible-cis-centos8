@@ -51,10 +51,6 @@
     - name: "Update package facts"
       package_facts:
         manager: "auto"
-
-    - name: "Debug"
-      debug:
-        msg: "{{ ansible_facts.services }}"
   when:
     - "'xorg-x11-server-common' in ansible_facts.packages"
     - rule_2_2_2
