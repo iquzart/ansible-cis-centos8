@@ -498,9 +498,9 @@
       changed_when: false
       failed_when: false
 
-    - name: "5.3.2 Select authselect profile (Scored) - select profile\n
+    - name: "5.3.2 Select authselect profile (Scored) | Set profile\n
              5.3.3 Ensure authselect includes with-faillock (Scored)"
-      command: authselect select custom/{{ authselect_profile }} {{ 5_3_3 | ternary("with-faillock", "") }} --force
+      command: authselect select custom/{{ authselect_profile }} without-nullok with-sudo with-mkhomedir {{ 5_3_3 | ternary("with-faillock", "") }} --force
       when:
         - authselect_current_profile.rc == 0
         - authselect_current_profile.stdout != "/".join(["custom", authselect_profile])
@@ -533,67 +533,34 @@
     - rule_5.4.1
     - section_5
 
-- name: "5.4.2 | Ensure lockout for failed password attempts is configured (Scored)"
-  block:
-    - name: "5.4.2 | Ensure lockout for failed password attempts is configured (Scored) | Unlock Time"
-      replace:
-        path: /etc/authselect/custom/{{ authselect_profile }}/{{ item }}
-        regexp: '^(\s*auth\s+required\s+pam_faillock.so\s+.*unlock_time=)\S+(\s*.*)$'
-        replace: '\g<1>{{ pam_failllock_timeout }}\g<2>'
-      with_items:
-        - password-auth
-        - system-auth
-
-    - name: 5.4.2 Ensure lockout for failed password attempts is configured (Scored) | Faillock Deny
-      replace:
-        path: /etc/authselect/custom/{{ authselect_profile }}/password-auth
-        regexp: '^(\s*auth\s+required\s+pam_faillock.so\s+.*deny=)\S+(\s*.*)$'
-        replace: '\g<1>{{ pam_failllock_deny }}\g<2>'
+- name: "5.4.2 | Ensure lockout for failed password attempts is configured (Scored)\n
+         5.4.3 | Ensure password reuse is limited (Scored)\n 
+         5.4.4 | Ensure password hashing algorithm is SHA-512 (Scored)"
+  template:
+    src: etc/pam/template_authselect.j2
+    dest: /etc/authselect/custom/{{ authselect_profile }}/{{ item }}
+  with_items:
+    - password-auth
+    - system-auth
   when:
     - rule_5_3_2
     - rule_5_3_3
     - rule_5_4_2
+    - rule_5_4_3
+    - rule_5_4_4
   tags:
     - level1
     - rule_5.4
     - rule_5.4.2
-    - section_5
-
-- name: "5.4.3 | Ensure password reuse is limited (Scored)"
-  command: /bin/true
-  changed_when: false
-  tags:
-    - level1
-    - rule_5.4
     - rule_5.4.3
     - section_5
 
-- name: "5.4.4 | Ensure password hashing algorithm is SHA-512 (Scored)"
-  command: /bin/true
-  changed_when: false
-  when:
-    - rule_5_4_4
-  tags:
-    - level1
-    - rule_5.4.4
-    - section_5
-
 - name: "5.5.1.1 | Ensure password expiration is 365 days or less (Scored)"
-  block:
-    - name: "5.5.1.1 | Ensure password expiration is 365 days or less (Scored)"
-      lineinfile:
-        dest: /etc/login.defs
-        regexp: "^\\s*PASS_MAX_DAYS\\s*.*$"
-        line: "PASS_MAX_DAYS {{ password_policy['max_days'] }}"
-        state: present
-    
-    - name: "5.5.1.1 | Ensure password expiration is 365 days or less (Scored)"
-      command: "awk -F: '{if($5 != {{ password_policy['max_days'] }}) print $1}' /etc/shadow"
-      register: users_exp_output
-
-    - name: "5.5.1.1 | Ensure password expiration is 365 days or less (Scored)"
-      command: "chage --maxdays {{ password_policy['max_days'] }} {{ item }}"
-      with_items: "{{ users_exp_output.stdout_lines }}"
+  lineinfile:
+    dest: /etc/login.defs
+    regexp: "^\\s*PASS_MAX_DAYS\\s*.*$"
+    line: "PASS_MAX_DAYS {{ password_policy['max_days'] }}"
+    state: present   
   when:
     - rule_5_5_1_1
   tags:

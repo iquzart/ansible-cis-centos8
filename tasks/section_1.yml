@@ -553,13 +553,13 @@
       lineinfile:
         dest: /usr/lib/systemd/system/emergency.service
         regexp: '/sbin/sulogin'
-        line: 'execstart=-/usr/lib/systemd/systemd-sulogin-shell rescue'
+        line: 'ExecStart=-/usr/lib/systemd/systemd-sulogin-shell rescue'
 
     - name: "1.5.3 | Ensure authentication required for single user mode (Scored) | Rescue"
       lineinfile:
         dest: /usr/lib/systemd/system/rescue.service
         regexp: '/sbin/sulogin'
-        line: 'execstart=-/usr/lib/systemd/systemd-sulogin-shell rescue'
+        line: 'ExecStart=-/usr/lib/systemd/systemd-sulogin-shell rescue'
   when:
     - rule_1_5_3
     - ansible_distribution_major_version == "8"
@@ -782,13 +782,25 @@
     - rule_1.8.1.6
 
 - name: "1.8.2 | Ensure GDM login banner is configured (Scored)"
-  template:
-    src: etc/dm3/greeter.dconf-defaults.j2
-    dest: /etc/dm3/greeter.dconf-defaults
+  lineinfile:
+    dest: "{{ item.file }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+    create: yes
     owner: root
     group: root
     mode: 0644
+  with_items:
+    - { file: '/etc/dconf/profile/gdm', regexp: 'user-db', line: 'user-db:user' }
+    - { file: '/etc/dconf/profile/gdm', regexp: 'system-db', line: 'system-db:gdm' }
+    - { file: '/etc/dconf/profile/gdm', regexp: 'file-db', line: 'file-db:/usr/share/gdm/greeter-dconf-defaults' }
+    - { file: '/etc/dconf/db/gdm.d/01-banner-message', regexp: '\[org\/gnome\/login-screen\]', line: '[org/gnome/login-screen]' }
+    - { file: '/etc/dconf/db/gdm.d/01-banner-message', regexp: 'banner-message-enable', line: 'banner-message-enable=true' }
+    - { file: '/etc/dconf/db/gdm.d/01-banner-message', regexp: 'banner-message-text', line: "banner-message-text='Authorized uses only. All activity may be monitored and reported.'"  }
+  notify: reload dconf
   when:
+    - not rule_2_2_2 | bool
     - "'gdm' in ansible_facts.packages"
     - rule_1_8_2
   tags:

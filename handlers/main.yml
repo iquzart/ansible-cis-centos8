@@ -14,9 +14,9 @@
   become: yes
   command: grub2-mkconfig -o {{ grub_config_file }}
 
-#- name: reload dconf
-#  become: yes
-#  command: dconf update
+- name: reload dconf
+  become: yes
+  command: dconf update
 
 - name: restart auditd
   become: yes
