@@ -1,5 +1,5 @@
 galaxy_info:
-  role_name: cis-centos
+  role_name: cis_centos_8
   author: iquzart
   description: CIS Benchmark for RHEL 8 Based Systems
   license: MIT

@@ -4,11 +4,11 @@
 - name: systemd restart tmp.mount
   become: yes
   systemd:
-      name: tmp.mount
-      daemon_reload: yes
-      enabled: yes
-      masked: no
-      state: reloaded
+    name: tmp.mount
+    daemon_reload: yes
+    enabled: yes
+    masked: no
+    state: reloaded
 
 - name: generate new grub config
   become: yes
@@ -30,8 +30,8 @@
 - name: restart sshd
   become: yes
   service:
-      name: sshd
-      state: restarted
+    name: sshd
+    state: restarted
 
 - name: authselect apply changes
   become: yes

@@ -1,7 +1,7 @@
 - name: "3.1.1 | Ensure IP forwarding is disabled (Scored)"
   sysctl:
-    name: '{{ item.name }}'
-    value: '{{ item.value }}'
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
     sysctl_set: yes
     state: present
     reload: yes
@@ -21,8 +21,8 @@
 
 - name: "3.1.2 | Ensure packet redirect sending is disabled (Scored)"
   sysctl:
-    name: '{{ item.name }}'
-    value: '{{ item.value }}'
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
     sysctl_set: yes
     state: present
     reload: yes
@@ -40,8 +40,8 @@
 
 - name: "3.2.1 | Ensure source routed packets are not accepted (Scored)"
   sysctl:
-    name: '{{ item.name }}'
-    value: '{{ item.value }}'
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
     sysctl_set: yes
     state: present
     reload: yes
@@ -61,8 +61,8 @@
 
 - name: "3.2.2 | Ensure ICMP redirects are not accepted (Scored)"
   sysctl:
-    name: '{{ item.name }}'
-    value: '{{ item.value }}'
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
     sysctl_set: yes
     state: present
     reload: yes
@@ -82,8 +82,8 @@
 
 - name: "3.2.3 | Ensure secure ICMP redirects are not accepted (Scored)"
   sysctl:
-    name: '{{ item.name }}'
-    value: '{{ item.value }}'
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
     sysctl_set: yes
     state: present
     reload: yes
@@ -101,8 +101,8 @@
 
 - name: "3.2.4 | Ensure suspicious packets are logged (Scored)"
   sysctl:
-    name: '{{ item.name }}'
-    value: '{{ item.value }}'
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
     sysctl_set: yes
     state: present
     reload: yes
@@ -150,8 +150,8 @@
 
 - name: "3.2.7 | Ensure Reverse Path Filtering is enabled (Scored)"
   sysctl:
-    name: '{{ item.name }}'
-    value: '{{ item.value }}'
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
     sysctl_set: yes
     state: present
     reload: yes
@@ -184,8 +184,8 @@
 
 - name: "3.2.9 | Ensure IPv6 router advertisements are not accepted (Scored)"
   sysctl:
-    name: '{{ item.name }}'
-    value: '{{ item.value }}'
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
     sysctl_set: yes
     state: present
     reload: yes
@@ -253,12 +253,11 @@
     - rule_3.3.4
     - section_3
 
-
 - name: "3.4.1.1 | Ensure a Firewall package is installed (Scored)"
   dnf:
     name: firewalld
     state: present
-  when: 
+  when:
     - rule_3_4_1_1
   tags:
     - level1
@@ -270,7 +269,7 @@
     name: firewalld
     state: started
     enabled: yes
-  when: 
+  when:
     - firewall == 'firewalld'
     - rule_3_4_2_1
   tags:
@@ -297,7 +296,7 @@
     enabled: no
     masked: yes
   when:
-    - firewall == 'firewalld'  
+    - firewall == 'firewalld'
     - rule_3_4_2_3
   tags:
     - level1
@@ -483,7 +482,7 @@
     - notimplemented
 
 - name: "3.6 | Disable IPv6 (Not Scored)"
-  block: 
+  block:
     - name: "3.6 | Disable IPv6 (Not Scored) | Check config"
       command: grep -E "GRUB_CMDLINE_LINUX=.*ipv6.disable=1.*" /etc/default/grub
       register: grep_ipv6_grub
