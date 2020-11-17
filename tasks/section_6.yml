@@ -1,5 +1,4 @@
 ---
-
 - name: "Get users accounts"
   command: "awk -F: '{print $1}' /etc/passwd"
   register: users
@@ -8,7 +7,6 @@
     - notscored
     - level2
     - section_6
-
 
 - name: "6.1.1 | Audit system file permissions (Not Scored)"
   cron:
@@ -447,7 +445,7 @@
     - section_6
 
 - name: "6.2.16 | Ensure no duplicate GIDs exist (Scored)"
-  block: 
+  block:
     - name: "6.2.16 | Ensure no duplicate GIDs exist (Scored) | Get GIDs"
       command: "awk -F: '{print $3}' /etc/group"
       register: gids

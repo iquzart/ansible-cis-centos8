@@ -1,6 +1,6 @@
 - name: "4.1.1.1 | Ensure auditd is installed (Scored)"
   yum:
-    name: 
+    name:
       - "audit"
       - "audit-libs"
     state: present
@@ -42,26 +42,26 @@
     - section_4
 
 - name: "4.1.1.4 | Ensure audit_backlog_limit is sufficient (Scored)"
-  block: 
-  - name: "4.1.1.4 | Ensure audit_backlog_limit is sufficient (Scored) | Check config"
-    command: grep -E "GRUB_CMDLINE_LINUX=.*audit_backlog_limit={{ audit_backlog_limit }}.*" /etc/default/grub
-    register: grep_audit_backlog_grub
-    failed_when: false
-    changed_when: false
+  block:
+    - name: "4.1.1.4 | Ensure audit_backlog_limit is sufficient (Scored) | Check config"
+      command: grep -E "GRUB_CMDLINE_LINUX=.*audit_backlog_limit={{ audit_backlog_limit }}.*" /etc/default/grub
+      register: grep_audit_backlog_grub
+      failed_when: false
+      changed_when: false
 
-  - name: "4.1.1.4 | Ensure audit_backlog_limit is sufficient (Scored) | Update config"
-    lineinfile:
-      dest: /etc/default/grub
-      regexp: '^GRUB_CMDLINE_LINUX="(.*)"$'
-      line: 'GRUB_CMDLINE_LINUX="\1 audit_backlog_limit={{ audit_backlog_limit }}"'
-      state: present
-      owner: root
-      group: root
-      mode: 0644
-      backrefs: true
-    notify: generate new grub config
-    when:
-      - grep_audit_backlog_grub.rc == 1
+    - name: "4.1.1.4 | Ensure audit_backlog_limit is sufficient (Scored) | Update config"
+      lineinfile:
+        dest: /etc/default/grub
+        regexp: '^GRUB_CMDLINE_LINUX="(.*)"$'
+        line: 'GRUB_CMDLINE_LINUX="\1 audit_backlog_limit={{ audit_backlog_limit }}"'
+        state: present
+        owner: root
+        group: root
+        mode: 0644
+        backrefs: true
+      notify: generate new grub config
+      when:
+        - grep_audit_backlog_grub.rc == 1
   when:
     - rule_4_1_1_4
   tags:
@@ -378,7 +378,6 @@
     - rule_4.1.17
     - section_4
 
-
 - name: "4.2.1.1 | Ensure rsyslog is installed (Scored)"
   dnf:
     name: rsyslog
@@ -409,7 +408,7 @@
   lineinfile:
     dest: /etc/rsyslog.conf
     regexp: '^\$FileCreateMode'
-    line: '$FileCreateMode 0640'
+    line: "$FileCreateMode 0640"
   when:
     - rule_4_2_1_3
   tags:
@@ -432,8 +431,8 @@
 - name: "4.2.1.5 | Ensure rsyslog is configured to send logs to a remote log host (Scored)"
   lineinfile:
     dest: /etc/rsyslog.conf
-    insertbefore: '^$FileCreateMode 0640'
-    line: '*.* @{{ rsyslog_dest  }}'
+    insertbefore: "^$FileCreateMode 0640"
+    line: "*.* @{{ rsyslog_dest  }}"
   when:
     - rule_4_2_1_5
   tags:
@@ -495,32 +494,32 @@
 
 - name: "4.2.3 | Ensure permissions on all logfiles are configured (Scored)"
   block:
-  - name: "4.2.3 |  Ensure permissions on all logfiles are configured (Scored) | Get files"
-    command: find /var/log -type f -perm /037
-    register: logfile_wrong_permissions
-    failed_when: false
-    changed_when: false
+    - name: "4.2.3 |  Ensure permissions on all logfiles are configured (Scored) | Get files"
+      command: find /var/log -type f -perm /037
+      register: logfile_wrong_permissions
+      failed_when: false
+      changed_when: false
 
-  - name: "4.2.3 | Ensure permissions on all logfiles are configured (Scored) | Get directories"
-    command: find /var/log -type d -perm /026
-    register: logdir_wrong_permissions
-    failed_when: false
-    changed_when: false
+    - name: "4.2.3 | Ensure permissions on all logfiles are configured (Scored) | Get directories"
+      command: find /var/log -type d -perm /026
+      register: logdir_wrong_permissions
+      failed_when: false
+      changed_when: false
 
-  - name: "4.2.3 | Ensure permissions on all logfiles are configured (Scored) | Set files permissions"
-    file:
-      dest: "{{ item }}"
-      mode: 0640
-    with_items: "{{ logfile_wrong_permissions.stdout_lines }}"
-    when: logfile_wrong_permissions.stdout_lines | length > 0
+    - name: "4.2.3 | Ensure permissions on all logfiles are configured (Scored) | Set files permissions"
+      file:
+        dest: "{{ item }}"
+        mode: 0640
+      with_items: "{{ logfile_wrong_permissions.stdout_lines }}"
+      when: logfile_wrong_permissions.stdout_lines | length > 0
 
-  - name: "4.2.3 | Ensure permissions on all logfiles are configured (Scored) | Set directories permissions"
-    file:
-      dest: "{{ item }}"
-      state: directory
-      mode: 0750
-    with_items: "{{ logdir_wrong_permissions.stdout_lines }}"
-    when: logdir_wrong_permissions.stdout_lines | length > 0
+    - name: "4.2.3 | Ensure permissions on all logfiles are configured (Scored) | Set directories permissions"
+      file:
+        dest: "{{ item }}"
+        state: directory
+        mode: 0750
+      with_items: "{{ logdir_wrong_permissions.stdout_lines }}"
+      when: logdir_wrong_permissions.stdout_lines | length > 0
   when:
     - rule_4_2_3
   tags:

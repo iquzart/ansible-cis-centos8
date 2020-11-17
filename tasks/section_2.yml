@@ -41,7 +41,7 @@
         state: absent
         name:
           - "xorg-x11*"
-    
+
     - name: Refresh destination information
       setup:
 
@@ -59,8 +59,7 @@
     - level1
     - scored
     - xwindows
-    - rule_2.2.2  
-   
+    - rule_2.2.2
 
 - name: "2.2.3 | Ensure rsync service is not enabled (Scored)"
   systemd:
@@ -137,7 +136,7 @@
     enabled: no
   when:
     - "'dovecot.service' in ansible_facts.services"
-    - rule_2_2_8 
+    - rule_2_2_8
   tags:
     - section_2
     - level1
@@ -328,4 +327,3 @@
     - section_2
     - level1
     - rule_2.3.3
-
