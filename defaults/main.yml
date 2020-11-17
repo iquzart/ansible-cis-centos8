@@ -255,11 +255,9 @@ rule_6_2_20: true          # Ensure all users' home directories exist
 
 # Bootloader password
 bootloader_password: p@ssw0rd
-set_boot_pass: true
 
 # AIDE
 config_aide: true
-# AIDE cron settings
 aide_cron:
   cron_user: root
   cron_file: /etc/crontab

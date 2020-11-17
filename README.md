@@ -1,39 +1,73 @@
-CIS - CentOs
+CIS - RHEL 8 Based Systems
 =========
 
-Asible role to apply CIS Benchmark on RHEL 8 based systems (Under Development)
+Asible role to apply CIS Benchmark on RHEL 8 based systems.
 
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+Create below partitions at the time of installation. The role will not create any of these partitions. 
+
+```
+1.1.6   | Ensure separate partition exists for /var (Scored)
+1.1.7   | Ensure separate partition exists for /var/tmp (Scored)
+1.1.11  | Ensure separate partition exists for /var/log (Scored)
+1.1.12  | Ensure separate partition exists for /var/log/audit (Scored)
+1.1.13  | Ensure separate partition exists for /home (Scored)
+
+```
+
+Support Matrix
+--------------
+
+| Destro | Status |
+| --- | --- |
+| CentOS 8 | Supported (Tested) | 
+| RHEL 8 | Supported (Tested) |
+| Oracle Linux 8 | Supported (Under Testing) |
+
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+deafult/main.yml variables are pretty self explanatory. 
 
-Dependencies
-------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+Notes
+------
 
+
+The role will setup Authselect with a custom profile when you enable CIS rules 5.3.1, 5.3.2, 5.4.2, 5.4.3, 5.4.4. 
+
+The recommended approch to join the node to an Active Directory domain with 'realmd'
+
+Update realmd-distro conf (/usr/lib/realmd/realmd-distro.conf) with below.
+```
+[commands]
+sssd-enable-logins = /usr/bin/sh -c "/usr/bin/systemctl enable oddjobd.service
+&& /usr/bin/systemctl start oddjobd.service"
+
+sssd-disable-logins = /bin/true
+```
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+- name: CIS Baseline Setup
+  hosts: cis
+  remote_user: vagrant
+  become: yes
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+  roles:
+    - cis-centos
+
 
 License
 -------
 
-BSD
+MIT
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Muhammed Iqbal <iquzart@hotmail.com>
