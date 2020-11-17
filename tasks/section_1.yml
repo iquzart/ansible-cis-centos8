@@ -1,24 +1,23 @@
 ---
 - name: "1.1.1.1 | Ensure mounting of cramfs filesystems is disabled (Scored)"
   lineinfile:
-    dest: /etc/modprobe.d/CIS.conf
+    dest: /etc/modprobe.d/cis.conf
     regexp: "^(#)?install cramfs(\\s|$)"
     line: "install cramfs /bin/true"
     create: yes
   when:
-    - rule_1_1_1_1|bool
+    - rule_1_1_1_1
   tags:
     - section_1
     - scored
     - cramfs
 
-- name: "1.1.1.1 | Remove cramfs module"
+- name: "1.1.1.1 | Remove cramfs module (Scored)"
   modprobe:
     name: cramfs
     state: absent
   when:
-    - rule_1_1_1_1|bool
-    - ansible_connection != 'docker'
+    - rule_1_1_1_1
   tags:
     - section_1
     - scored
@@ -26,24 +25,13 @@
 
 - name: "1.1.1.2 | Ensure mounting of vFAT filesystems is limited (Not Scored)"
   lineinfile:
-    dest: /etc/modprobe.d/CIS.conf
+    dest: /etc/modprobe.d/cis.conf
     regexp: "^(#)?install vfat(\\s|$)"
     line: "install vfat /bin/true"
     create: yes
   when:
-    - rule_1_1_1_2|bool
-  tags:
-    - section_1
-    - not_scored
-    - vfat
-
-- name: "1.1.1.2 | Remove FAT module"
-  modprobe:
-    name: vfat
-    state: absent
-  when:
-    - rule_1_1_1_2|bool
-    - ansible_connection != 'docker'
+    - rule_1_1_1_2
+    - not booted_with_efi
   tags:
     - section_1
     - not_scored
@@ -51,24 +39,23 @@
 
 - name: "1.1.1.3 | Ensure mounting of squashfs filesystems is disabled (Scored)"
   lineinfile:
-    dest: /etc/modprobe.d/CIS.conf
+    dest: /etc/modprobe.d/cis.conf
     regexp: "^(#)?install squashfs(\\s|$)"
     line: "install squashfs /bin/true"
     create: yes
   when:
-    - rule_1_1_1_3|bool
+    - rule_1_1_1_3
   tags:
     - section_1
     - scored
     - squashfs
 
-- name: "1.1.1.3 | Remove squashfs module"
+- name: "1.1.1.3 | Remove squashfs module (Scored)"
   modprobe:
     name: squashfs
     state: absent
   when:
-    - rule_1_1_1_3|bool
-    - ansible_connection != 'docker'
+    - rule_1_1_1_3
   tags:
     - section_1
     - scored
@@ -77,31 +64,30 @@
 
 - name: "1.1.1.4 | Ensure mounting of udf filesystems is disabled (Scored)"
   lineinfile:
-    dest: /etc/modprobe.d/CIS.conf
+    dest: /etc/modprobe.d/cis.conf
     regexp: "^(#)?install udf(\\s|$)"
     line: "install udf /bin/true"
     create: yes
   when:
-    - rule_1_1_1_4|bool
+    - rule_1_1_1_4
   tags:
     - section_1
     - scored
     - udf
 
-- name: "1.1.1.4 | Remove udf module"
+- name: "1.1.1.4 | Remove udf module (Scored)"
   modprobe:
     name: udf
     state: absent
   when:
-    - rule_1_1_1_4|bool
-    - ansible_connection != 'docker'
+    - rule_1_1_1_4
   tags:
     - section_1
     - scored
     - udf
 
 
-- name: "1.1.2 | Ensure separate partition exists for /tmp | enable and start/restart tmp.mount"
+- name: "1.1.2 | Ensure separate partition exists for /tmp | Enable and start/restart tmp.mount  (Scored)"
   systemd:
     name: tmp.mount
     daemon_reload: yes
@@ -109,23 +95,23 @@
     masked: no
     state: started
   when:
-    - rule_1_1_2|bool
+    - rule_1_1_2
   tags:
     - section_1
     - scored
     - rule_1.1.2
 
-- name: "1.1.3 | 1.1.4 | 1.1.5 | Ensure nodev,nosuid,noexec options set on /tmp partition"
+- name: "1.1.3 | 1.1.4 | 1.1.5 | Ensure nodev,nosuid,noexec options set on /tmp partition (Scored)"
   template:
     src: tmp.mount.j2
     dest: /etc/systemd/system/tmp.mount
     owner: root
     group: root
     mode: 0644
-  notify: systemd restart tmp.mount
-  when: rule_1_1_3|bool or 
-        rule_1_1_4|bool or 
-        rule_1_1_5|bool
+#  notify: systemd restart tmp.mount
+  when: rule_1_1_3 or 
+        rule_1_1_4 or 
+        rule_1_1_5
   tags:
     - section_1
     - scored
@@ -169,19 +155,21 @@
          1.1.9  | Ensure nosuid option set on /var/tmp partition (Scored)\n
          1.1.10 | Ensure noexec option set on /var/tmp partition (Scored)"
   mount:
-    name: /var/tmp
-    src: "{{ vartmp['source'] }}"
-    state: present
-    fstype: "{{ vartmp['fstype'] }}"
-    opts: "{{ vartmp['opts'] }}"
+    name: "/var/tmp"
+    src: "{{ item.device }}"
+    state: mounted
+    fstype: "{{ item.fstype }}"
+    opts: "defaults{% if rule_1_1_8 %},nodev{% endif %}{% if  rule_1_1_9 %},nosuid{% endif %}{% if rule_1_1_10 %},noexec{% endif %}"
+  with_items: "{{ ansible_mounts }}"
   when:
-    - rule_1_1_8|bool
-    - rule_1_1_9|bool
-    - rule_1_1_10|bool
+    - item.mount == "/var/tmp"
+    - rule_1_1_7
+    - rule_1_1_8 or rule_1_1_9 or rule_1_1_10  
   tags:
     - level1
     - scored
     - patch
+    - rule_1.1.7
     - rule_1.1.8
     - rule_1.1.9
     - rule_1.1.10
@@ -226,7 +214,7 @@
   changed_when: no
   failed_when: no
   when:
-    - rule_1_1_13|bool
+    - rule_1_1_13
   tags:
     - level2
     - scored
@@ -242,7 +230,7 @@
     fstype: "{{ item.fstype }}"
     opts: "nodev"
   when:
-    - rule_1_1_14|bool
+    - rule_1_1_14
     - item.mount == "/home"
   with_items: "{{ ansible_mounts }}"
   tags:
@@ -326,18 +314,25 @@
     name: autofs
     enabled: no
   when:
+    - rule_1_1_22
     - "'autofs.service' in ansible_facts.services"
-    - rule_1_1_22|bool
   tags:
     - level1
     - patch
     - rule_1.1.22
 
 - name: "1.1.23 | Disable USB Storage (Scored)"
-  command: rmmod usb-storage
-  ignore_errors: yes
+  lineinfile:
+    dest: /etc/modprobe.d/cis.conf
+    regexp: "^(#)?\\s*install\\s+usb-storage(\\s*|$)"
+    line: "install usb-storage /bin/true"
+    state: present
+    owner: root
+    group: root
+    mode: 0644
+    create: true
   when:
-    - rule_1_1_23|bool
+    - rule_1_1_23
   tags:
     - level1
     - scored
@@ -464,7 +459,7 @@
     name: aide
     state: present
   when:
-    - rule_1_4_1|bool
+    - rule_1_4_1
   tags:
     - level1
     - scored
@@ -481,8 +476,8 @@
   async: 45
   poll: 0
   when:
-    - config_aide|bool
-    - rule_1_4_1|bool
+    - config_aide
+    - rule_1_4_1
   tags:
     - level1
     - scored
@@ -502,7 +497,7 @@
     weekday: "{{ aide_cron['aide_weekday'] | default('*') }}"
     job: "{{ aide_cron['aide_job'] }}"
   when:
-    - rule_1_4_2|bool
+    - rule_1_4_2
   tags:
     - level1
     - scored
@@ -512,11 +507,16 @@
     - rule_1.4.2
 
 - name: "1.5.1 | Ensure permissions on bootloader config are configured (Scored)"
-  stat:
-    path: /etc/grub2.cfg
-  register: grub_cfg
+  file:
+    path: "{{ item }}"
+    owner: root
+    group: root
+    mode: 0600
   when:
-    - rule_1_5_1|bool
+    - rule_1_5_1
+  with_items:
+    - /boot/grub2/grubenv
+    - "{{ grub_config_file }}"
   tags:
     - level1
     - scored
@@ -524,21 +524,6 @@
     - patch
     - rule_1.5.1
 
-- name: "1.5.1 | Ensure permissions on bootloader config are configured (Scored)"
-  file:
-    path: "{{ grub_cfg.stat.lnk_source }}"
-    owner: root
-    group: root
-    mode: 0600
-  when:
-    - grub_cfg.stat.exists and grub_cfg.stat.islnk
-    - rule_1_5_1|bool
-  tags:
-    - level1
-    - scored
-    - grub
-    - patch
-    - rule_1.5.1
 
 - name: "1.5.2 | Ensure bootloader password is set (Scored)" 
   block:
@@ -562,22 +547,22 @@
     - grub
     - rule_1.5.2
 
-- name: "NOT1.5.3 | Ensure authentication required for single user mode (Scored)"
+- name: "1.5.3 | Ensure authentication required for single user mode (Scored)"
   block:
-    - name: "NOT1.5.3 | Ensure authentication required for single user mode (Scored) - emergency"
+    - name: "1.5.3 | Ensure authentication required for single user mode (Scored) | Emergency"
       lineinfile:
         dest: /usr/lib/systemd/system/emergency.service
         regexp: '/sbin/sulogin'
-        line: 'execstart=-/usr/lib/systemd/systemd-sulogin-shell rescue'
+        line: 'ExecStart=-/usr/lib/systemd/systemd-sulogin-shell rescue'
 
-    - name: "NOT1.5.3 | Ensure authentication required for single user mode (Scored) - rescue"
+    - name: "1.5.3 | Ensure authentication required for single user mode (Scored) | Rescue"
       lineinfile:
         dest: /usr/lib/systemd/system/rescue.service
         regexp: '/sbin/sulogin'
-        line: 'execstart=-/usr/lib/systemd/systemd-sulogin-shell rescue'
+        line: 'ExecStart=-/usr/lib/systemd/systemd-sulogin-shell rescue'
   when:
     - rule_1_5_3
-    - ansible_distribution_major_version == 8
+    - ansible_distribution_major_version == "8"
   tags:
     - level1
     - level2
@@ -592,7 +577,7 @@
     line: '*                hard    core            0'
     insertbefore: '^# End of file'
   when:
-    - rule_1_6_1|bool
+    - rule_1_6_1
   tags:
     - level1
     - scored
@@ -609,7 +594,7 @@
     sysctl_set: yes
     ignoreerrors: yes
   when:
-    - rule_1_6_1|bool
+    - rule_1_6_1
   tags:
     - level1
     - scored
@@ -626,7 +611,7 @@
     sysctl_set: yes
     ignoreerrors: yes
   when:
-    - rule_1_6_2|bool
+    - rule_1_6_2
   tags:
     - level1
     - scored
@@ -643,38 +628,22 @@
   notify: generate new grub config
   when:
     - selinux_state == "enforcing" 
-    - rule_1_7_1_2|bool
+    - rule_1_7_1_2
   tags:
     - level2
     - scored
     - patch
     - rule_1.7.1.2
 
-###############################################
-#- name: "1.7.1.3 | Ensure SELinux policy is configured (Scored)"
-#  selinux:
-#    conf: /etc/selinux/config
-#    policy: "{{ selinux_policy }}"
-#    state: "{{ selinux_state }}"
-#  debug:
-#    msg: "--> Not relevant"
-#  changed_when: no
-#  when:
-#    - rule_1_7_1_3|bool
-#  tags:
-#    - level2
-#    - scored
-#    - selinux
-#    - patch
-#    - rule_1.7.1.3
-################################################
-- name: "1.7.1.4 | Ensure the SELinux state is enforcing (Scored)"
+- name: "1.7.1.3 | Ensure the SELinux policy is configured (Scored)\n
+         1.7.1.4 | Ensure the SELinux state is enforcing (Scored)"
   selinux:
     conf: /etc/selinux/config
     policy: "{{ selinux_policy }}"
     state: "{{ selinux_state }}"
   when:
-    - rule_1_7_1_4|bool
+    - rule_1_7_1_3
+    - rule_1_7_1_4
   tags:
     - level2
     - scored
@@ -688,7 +657,7 @@
   changed_when: no
   failed_when: no
   when:
-    - rule_1_7_1_5|bool
+    - rule_1_7_1_5
   tags:
     - level2
     - scored
@@ -700,7 +669,7 @@
     name: setroubleshoot
     state: absent
   when:
-    - rule_1_7_1_6|bool
+    - rule_1_7_1_6
   tags:
     - level2
     - scored
@@ -713,7 +682,7 @@
     name: mcstrans
     state: absent
   when:
-    - rule_1_7_1_7|bool
+    - rule_1_7_1_7
   tags:
     - level2
     - scored
@@ -725,7 +694,7 @@
     name: libselinux
     state: present
   when:
-    - rule_1_7_1_1|bool
+    - rule_1_7_1_1
   tags:
     - level2
     - scored
@@ -737,7 +706,7 @@
     src: etc/motd.j2
     dest: /etc/motd
   when:
-    - rule_1_8_1_1|bool
+    - rule_1_8_1_1
   tags:
     - level1
     - banner
@@ -749,7 +718,7 @@
     src: etc/issue.j2
     dest: /etc/issue
   when:
-    - rule_1_8_1_2|bool
+    - rule_1_8_1_2
   tags:
     - level1
     - patch
@@ -760,7 +729,7 @@
     src: etc/issue.net.j2
     dest: /etc/issue.net
   when:
-    - rule_1_8_1_3|bool
+    - rule_1_8_1_3
   tags:
     - level1
     - banner
@@ -775,7 +744,7 @@
     group: root
     mode: 0644
   when:
-    - rule_1_8_1_4|bool
+    - rule_1_8_1_4
   tags:
     - level1
     - perms
@@ -790,7 +759,7 @@
     group: root
     mode: 0644
   when:
-    - rule_1_8_1_5|bool
+    - rule_1_8_1_5
   tags:
     - level1
     - perms
@@ -805,7 +774,7 @@
     group: root
     mode: 0644
   when:
-    - rule_1_8_1_6|bool
+    - rule_1_8_1_6
   tags:
     - level1
     - perms
@@ -828,10 +797,12 @@
     - { file: '/etc/dconf/profile/gdm', regexp: 'file-db', line: 'file-db:/usr/share/gdm/greeter-dconf-defaults' }
     - { file: '/etc/dconf/db/gdm.d/01-banner-message', regexp: '\[org\/gnome\/login-screen\]', line: '[org/gnome/login-screen]' }
     - { file: '/etc/dconf/db/gdm.d/01-banner-message', regexp: 'banner-message-enable', line: 'banner-message-enable=true' }
-    - { file: '/etc/dconf/db/gdm.d/01-banner-message', regexp: 'banner-message-text', line: "banner-message-text='{{ warning_banner }}' " }
+    - { file: '/etc/dconf/db/gdm.d/01-banner-message', regexp: 'banner-message-text', line: "banner-message-text='Authorized uses only. All activity may be monitored and reported.'"  }
+  notify: reload dconf
   when:
-    - gui|bool
-    - rule_1_8_2|bool
+    - not rule_2_2_2 | bool
+    - "'gdm' in ansible_facts.packages"
+    - rule_1_8_2
   tags:
     - level1
     - level2
@@ -852,30 +823,32 @@
 
 - name: "1.10 | Ensure system-wide crypto policy is not legacy (Scored)"
   block:
-    - name: 1.10 | Ensure system-wide crypto policy is not legacy (Scored) | Check Current Crypto Policy
-      slurp:
-        src: /etc/crypto-policies/config
-      register: cryptopolicies
+    - name: "1.10 | Ensure system-wide crypto policy is not legacy (Scored) | Check Current Crypto Policy"
+      command: grep -E '^\s*(DEFAULT|FUTURE|FIPS)\s*$' /etc/crypto-policies/config
+      register: c_policy
+      changed_when: false
+      failed_when: false
 
-    - name: 1.10 | Ensure system-wide crypto policy is not legacy (Scored) | Update if not to DEFAULT
-      command: update-crypto-policies --set DEFAULT
+    - name: "1.10 | Ensure system-wide crypto policy is not legacy (Scored)"
+      command: update-crypto-policies --set {{ crypto_policy }}
       when:
-        - '"LEGACY" in cryptopolicies.content|b64decode'
+        - c_policy.stdout == 'LEGACY'
   when:
     - rule_1_10
+    - rule_1_11
   tags:
     - level1
     - level2
     - section_1
     - rule_1.10
+    - rule_1.11
     - crypto
 
 - name: "1.11 | Ensure system-wide crypto policy is FUTURE or FIPS (Scored)"
-  shell: |
-    update-crypto-policies --set {{ crypto_policy }}
-    update-crypto-policies
+  command: update-crypto-policies --set {{ crypto_policy }}
   when:
-    - rule_1_11|bool
+    - rule_1_11
+    - c_policy.stdout == 'DEFAULT' or c_policy.stdout == 'LEGACY'
   tags:
     - level1
     - level2

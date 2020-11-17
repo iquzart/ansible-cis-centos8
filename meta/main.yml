@@ -9,7 +9,9 @@ galaxy_info:
       versions:
         - 8
   galaxy_tags:
-    - docker
-    - compose
-    - containers
+    - cis
+    - rhel8
+    - centos8
+    - ol8
+    - baseline
 dependencies: []

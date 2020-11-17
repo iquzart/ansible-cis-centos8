@@ -1,5 +1,5 @@
 ---
-- name: "2.1.1 | Ensure xinetd is not installed"
+- name: "2.1.1 | Ensure xinetd is not installed (Scored)"
   dnf:
     name: xinetd
     state: absent
@@ -11,7 +11,7 @@
     - scored
     - rule_2.1.1
 
-- name: "2.2.1.1 | Ensure time synchronization is in use"
+- name: "2.2.1.1 | Ensure time synchronization is in use (Not Scored)"
   dnf:
     name: chrony
     state: present
@@ -20,7 +20,7 @@
     - level1
     - rule_2.2.1.1
 
-- name: "2.2.1.2 | Ensure chrony is configured"
+- name: "2.2.1.2 | Ensure chrony is configured (Scored)"
   template:
     src: etc/chrony.conf.j2
     dest: /etc/chrony.conf
@@ -34,33 +34,25 @@
     - level1
     - rule_2.2.1.2
 
-- name: "2.2.2 | Ensure X Window System is not installed"
-  package:
-    state: absent
-    name:
-      - "xorg-x11*"
-  when:
-    - not xwindows_required | bool
-    - "'xorg-x11' in ansible_facts.packages"
-    - rule_2_2_2
-  tags:
-    - section_2
-    - level1
-    - scored
-    - xwindows
-    - rule_2.2.2
-
-- name: "Update facts" 
+- name: "2.2.2 | Ensure X Window System is not installed (Scored)"
   block:
-    - name: "Update package facts"
-      package_facts:
-        manager: "auto"
+    - name: "2.2.2 | Ensure X Window System is not installed (Scored)"
+      package:
+        state: absent
+        name:
+          - "xorg-x11*"
+    
+    - name: Refresh destination information
+      setup:
 
     - name: "Update service facts"
       service_facts:
+
+    - name: "Update package facts"
+      package_facts:
+        manager: "auto"
   when:
-    - not xwindows_required | bool
-    - "'xorg-x11' in ansible_facts.packages"
+    - "'xorg-x11-server-common' in ansible_facts.packages"
     - rule_2_2_2
   tags:
     - section_2
@@ -68,9 +60,9 @@
     - scored
     - xwindows
     - rule_2.2.2  
+   
 
-
-- name: "2.2.3 | Ensure rsync service is not enabled "
+- name: "2.2.3 | Ensure rsync service is not enabled (Scored)"
   systemd:
     name: rsyncd
     state: stopped
@@ -83,13 +75,13 @@
     - level1
     - rule_2.2.3
 
-- name: "2.2.4 | Ensure Avahi Server is not enabled"
+- name: "2.2.4 | Ensure Avahi Server is not enabled (Scored)"
   systemd:
     name: avahi-daemon
     state: stopped
     enabled: no
   when:
-    - "'avahi-daemon' in ansible_facts.services"
+    - "'avahi-daemon.service' in ansible_facts.services"
     - rule_2_2_4
   tags:
     - section_2
@@ -99,7 +91,7 @@
     - services
     - rule_2.2.4
 
-- name: "2.2.5 | Ensure SNMP Server is not enabled"
+- name: "2.2.5 | Ensure SNMP Server is not enabled (Scored)"
   systemd:
     name: snmpd
     state: stopped
@@ -112,7 +104,7 @@
     - level1
     - rule_2.2.5
 
-- name: "2.2.6 | Ensure HTTP Proxy Server is not enabled"
+- name: "2.2.6 | Ensure HTTP Proxy Server is not enabled (Scored)"
   systemd:
     name: squid
     state: stopped
@@ -125,7 +117,7 @@
     - level1
     - rule_2.2.6
 
-- name: "2.2.7 | Ensure Samba is not enabled"
+- name: "2.2.7 | Ensure Samba is not enabled (Scored)"
   systemd:
     name: smb
     state: stopped
@@ -138,7 +130,7 @@
     - level1
     - rule_2.2.7
 
-- name: "2.2.8 | Ensure IMAP and POP3 server is not enabled"
+- name: "2.2.8 | Ensure IMAP and POP3 server is not enabled (Scored)"
   systemd:
     name: dovecot
     state: stopped
@@ -180,7 +172,7 @@
     - scored
     - rule_2.2.10
 
-- name: "2.2.11 | Ensure DNS Server is not enabled"
+- name: "2.2.11 | Ensure DNS Server is not enabled (Scored)"
   systemd:
     name: named
     state: stopped
@@ -193,13 +185,13 @@
     - level1
     - rule_2.2.11
 
-- name: "2.2.12 | Ensure NFS is not enabled"
+- name: "2.2.12 | Ensure NFS is not enabled (Scored)"
   systemd:
-    name: nfs
+    name: nfs-server
     state: stopped
     enabled: no
   when:
-    - "'nfs.service' in ansible_facts.services"
+    - "'nfs-server.service' in ansible_facts.services"
     - rule_2_2_12
   tags:
     - section_2
@@ -210,7 +202,7 @@
     - services
     - rule_2.2.12
 
-- name: "2.2.13 | Ensure RPC is not enabled"
+- name: "2.2.13 | Ensure RPC is not enabled (Scored)"
   systemd:
     name: rpcbind
     state: stopped
@@ -227,7 +219,7 @@
     - services
     - rule_2.2.13
 
-- name: "2.2.14 | Ensure LDAP server is not enabled"
+- name: "2.2.14 | Ensure LDAP server is not enabled (Scored)"
   service:
     name: slapd
     state: stopped
@@ -243,7 +235,7 @@
     - services
     - rule_2.2.14
 
-- name: "2.2.15 | Ensure DHCP Server is not enabled"
+- name: "2.2.15 | Ensure DHCP Server is not enabled (Scored)"
   systemd:
     name: dhcpd
     state: stopped
@@ -259,13 +251,13 @@
     - services
     - rule_2.2.14
 
-- name: "2.2.16 | Ensure CUPS is not enabled"
+- name: "2.2.16 | Ensure CUPS is not enabled (Scored)"
   systemd:
     name: cups
     state: stopped
     enabled: no
   when:
-    - "'cups.service' in ansible_facts.services"
+    - "'cups' in ansible_facts.packages"
     - rule_2_2_16
   tags:
     - section_2
@@ -275,7 +267,7 @@
     - services
     - rule_2.2.16
 
-- name: "2.2.17 | Ensure NIS Server is not enabled"
+- name: "2.2.17 | Ensure NIS Server is not enabled (Scored)"
   systemd:
     name: ypserv
     state: stopped
@@ -288,7 +280,7 @@
     - level1
     - rule_2.2.17
 
-- name: "2.2.18 | Ensure mail transfer agent is configured for local-only mode"
+- name: "2.2.18 | Ensure mail transfer agent is configured for local-only mode (Scored)"
   lineinfile:
     dest: /etc/postfix/main.cf
     regexp: "^(#)?inet_interfaces"
@@ -301,7 +293,7 @@
     - level1
     - rule_2.2.18
 
-- name: "2.3.1 | Ensure NIS Client is not installed"
+- name: "2.3.1 | Ensure NIS Client is not installed (Scored)"
   dnf:
     name: ypbind
     state: absent
@@ -313,7 +305,7 @@
     - level1
     - rule_2.3.1
 
-- name: "2.3.2 | Ensure telnet client is not installed"
+- name: "2.3.2 | Ensure telnet client is not installed (Scored)"
   dnf:
     name: telnet
     state: absent
@@ -325,7 +317,7 @@
     - level1
     - rule_2.3.2
 
-- name: "2.3.3 | Ensure LDAP client is not installed"
+- name: "2.3.3 | Ensure LDAP client is not installed (Scored)"
   dnf:
     name: openldap-clients
     state: absent

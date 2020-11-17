@@ -17,12 +17,28 @@
   tags:
       - always
 
-- name: "Set package facts"
+- name: "Set facts | Packages"
   package_facts:
     manager: "auto"
+  tags:
+    - always
 
-- name: "Set service facts"
+- name: "Set facts | Service"
   service_facts:
+  tags:
+    - always
+
+- name: Check if the system booted with UEFI or BIOS
+  set_fact:
+    booted_with_efi: "{{ ansible_mounts | selectattr('mount', 'equalto', '/boot/efi') | list | length > 0 }}"
+  tags:
+    - always
+    
+- name: Set facts | Grub config file 
+  set_fact:
+    grub_config_file: "{{ '/boot/efi/EFI/{{ ansible_distribution | lower }}/grub.cfg' if booted_with_efi  else '/boot/grub2/grub.cfg' }}"
+  tags:
+    - always
 
 - include: section_1.yml
   become: true
@@ -35,3 +51,27 @@
   when: section_2
   tags: 
     - section_2
+
+- include: section_3.yml
+  become: true
+  when: section_3
+  tags: 
+    - section_3
+
+- include: section_4.yml
+  become: true
+  when: section_4
+  tags: 
+    - section_4
+
+- include: section_5.yml
+  become: true
+  when: section_5
+  tags: 
+    - section_5
+
+- include: section_6.yml
+  become: true
+  when: section_6
+  tags: 
+    - section_6

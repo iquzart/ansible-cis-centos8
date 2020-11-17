@@ -12,5 +12,27 @@
 
 - name: generate new grub config
   become: yes
-  command: grub2-mkconfig -o "{{ grub_cfg.stat.lnk_source }}"
+  command: grub2-mkconfig -o {{ grub_config_file }}
 
+- name: reload dconf
+  become: yes
+  command: dconf update
+
+- name: restart auditd
+  become: yes
+  command: /sbin/service auditd restart
+  changed_when: no
+  check_mode: no
+  failed_when: no
+  args:
+    warn: no
+
+- name: restart sshd
+  become: yes
+  service:
+      name: sshd
+      state: restarted
+
+- name: authselect apply changes
+  become: yes
+  command: authselect apply-changes
