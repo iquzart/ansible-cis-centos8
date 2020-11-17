@@ -542,6 +542,7 @@
   with_items:
     - password-auth
     - system-auth
+  notify: authselect apply changes
   when:
     - rule_5_3_2
     - rule_5_3_3
