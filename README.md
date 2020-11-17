@@ -53,14 +53,15 @@ sssd-disable-logins = /bin/true
 Example Playbook
 ----------------
 
-- name: CIS Baseline Setup
-  hosts: cis
-  remote_user: vagrant
-  become: yes
+```
+  - name: CIS Baseline Setup
+    hosts: cis
+    remote_user: vagrant
+    become: yes
 
-  roles:
-    - cis-centos
-
+    roles:
+      - cis-centos
+```
 
 License
 -------
