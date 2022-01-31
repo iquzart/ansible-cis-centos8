@@ -25,7 +25,7 @@ Support Matrix
 | --- | --- |
 | CentOS 8 | Supported (Tested) | 
 | RHEL 8 | Supported (Tested) |
-| Oracle Linux 8 | Supported (Under Testing) |
+| Oracle Linux 8 | Supported (Tested) |
 
 
 Role Variables
@@ -60,7 +60,7 @@ Example Playbook
     become: yes
 
     roles:
-      - cis-centos
+      - iquzart.cis_centos_8
 ```
 
 License
