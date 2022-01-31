@@ -60,7 +60,7 @@ Example Playbook
     become: yes
 
     roles:
-      - cis-centos
+      - iquzart.cis_centos_8
 ```
 
 License
