@@ -493,7 +493,7 @@
 
     - name: "5.3.2 Select authselect profile (Scored) | Set profile\n
         5.3.3 Ensure authselect includes with-faillock (Scored)"
-      command: authselect select custom/{{ authselect_profile }} without-nullok with-sudo with-mkhomedir {{ 5_3_3 | ternary("with-faillock", "") }} --force
+      command: authselect select custom/{{ authselect_profile }} without-nullok with-sudo with-mkhomedir {{ rule_5_3_3 | ternary("with-faillock", "") }} --force
       when:
         - authselect_current_profile.rc == 0
         - authselect_current_profile.stdout != "/".join(["custom", authselect_profile])

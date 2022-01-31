@@ -41,7 +41,7 @@
     dest: /etc/shadow
     owner: root
     group: root
-    mode: 0640
+    mode: 0000
   when:
     - rule_6_1_3
   tags:
@@ -67,7 +67,7 @@
     dest: /etc/gshadow
     owner: root
     group: root
-    mode: 0640
+    mode: 0000
   when:
     - rule_6_1_5
   tags:
@@ -80,7 +80,7 @@
     dest: /etc/passwd-
     owner: root
     group: root
-    mode: 0600
+    mode: 0644
   when:
     - rule_6_1_6
   tags:
@@ -93,7 +93,7 @@
     dest: /etc/shadow-
     owner: root
     group: root
-    mode: 0600
+    mode: 0000
   when:
     - rule_6_1_7
   tags:
@@ -119,7 +119,7 @@
     dest: /etc/gshadow-
     owner: root
     group: root
-    mode: 0640
+    mode: 0000
   when:
     - rule_6_1_9
   tags:
@@ -169,7 +169,7 @@
     - name: "6.1.11 | Ensure no unowned files or directories exist (Scored) | Set permission"
       file:
         path: "{{ item }}"
-        owner: "{{ rule_user_unowned_file }}"
+        owner: "{{ user_unowned_file }}"
       when:
         - unowned_files.stdout_lines | length > 0
       with_items: "{{ unowned_files.stdout_lines }}"
@@ -195,7 +195,7 @@
     - name: "6.1.12 | Ensure no ungrouped files or directories exist (Scored) | Set permission"
       file:
         path: "{{ item }}"
-        group: "{{ rule_group_ungrouped_file }}"
+        group: "{{ group_ungrouped_file }}"
       with_items: "{{ ungrouped_files.stdout_lines }}"
       when:
         - ungrouped_files.stdout_lines | length > 0
