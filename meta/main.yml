@@ -1,6 +1,6 @@
 galaxy_info:
   role_name: cis_centos_8
-  author: consol
+  author: iquzart
   description: CIS Benchmark for RHEL 8 Based Systems
   license: MIT
   min_ansible_version: 2.9
